@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LTO Queuing System - Kiosk</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Load QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Socket.IO for real-time queue updates -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- ================= HEADER ================= -->
+
+  <nav class="navbar navbar-expand-lg lto-header shadow">
+
+    <div class="container-fluid">
+
+      <div class="d-flex align-items-center">
+
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg"
+          width="60" class="me-3">
+
+        <div>
+
+          <h4 class="text-white fw-bold mb-0">
+
+            LAND TRANSPORTATION OFFICE
+
+          </h4>
+
+          <div class="fw-semibold small" style="color: var(--lto-yellow);">
+
+            San Pedro Extension Office
+
+          </div>
+
+          <div class="small opacity-75 text-white-50" style="font-size: 0.75rem;">
+
+            Smart Queue Management System
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+
+        <div class="d-none d-sm-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1.5 rounded-pill border border-white border-opacity-10">
+
+          <div class="user-avatar" id="avatarLetter" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; color: var(--lto-primary);">R</div>
+
+          <div class="d-flex flex-column text-start text-white">
+
+            <span class="small fw-bold" id="profileName" style="font-size: 0.8rem; line-height: 1.2;">Receptionist</span>
+
+            <span class="text-white-50" style="font-size: 0.6rem; text-transform: uppercase; line-height: 1.2;">Kiosk Mode</span>
+
+          </div>
+
+        </div>
+
+        <button id="logoutBtn" class="btn btn-light btn-sm px-3">
+
+          <i class="bi bi-box-arrow-right"></i>
+
+          Logout
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </nav>
+
+  <!-- ================= HERO ================= -->
+
+  <section class="py-5">
+
+    <div class="container">
+
+      <div class="text-center mb-5">
+
+        <h1 class="display-5 fw-bold">
+
+          Select Your Transaction
+
+        </h1>
+
+        <p class="lead text-secondary">
+
+          Touch a service below to receive your queue number.
+
+        </p>
+
+      </div>
+
+      <!-- ================= SERVICES ================= -->
+
+      <div class="row g-4">
+
+        <!-- Licensing -->
+
+        <div class="col-lg-4">
+
+          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Licensing')">
+
+            <div class="mb-4">
+
+              <i class="bi bi-person-vcard-fill text-primary" style="font-size:70px"></i>
+
+            </div>
+
+            <h3 class="fw-bold">
+
+              Licensing
+
+            </h3>
+
+            <hr>
+
+            <ul class="list-unstyled text-secondary">
+
+              <li>Driver's License</li>
+
+              <li>Student Permit</li>
+
+              <li>Renewal</li>
+
+              <li>Duplicate License</li>
+
+            </ul>
+
+            <button class="btn btn-lto-blue mt-3">
+
+              GET QUEUE NUMBER
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- Registration -->
+
+        <div class="col-lg-4">
+
+          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Registration')">
+
+            <div class="mb-4">
+
+              <i class="bi bi-car-front-fill text-success" style="font-size:70px"></i>
+
+            </div>
+
+            <h3 class="fw-bold">
+
+              Vehicle Registration
+
+            </h3>
+
+            <hr>
+
+            <ul class="list-unstyled text-secondary">
+
+              <li>Renewal</li>
+
+              <li>Transfer Ownership</li>
+
+              <li>New Registration</li>
+
+              <li>Plate Release</li>
+
+            </ul>
+
+            <button class="btn btn-success mt-3">
+
+              GET QUEUE NUMBER
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- Misc -->
+
+        <div class="col-lg-4">
+
+          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Miscellaneous')">
+
+            <div class="mb-4">
+
+              <i class="bi bi-folder2-open text-warning" style="font-size:70px"></i>
+
+            </div>
+
+            <h3 class="fw-bold">
+
+              Miscellaneous
+
+            </h3>
+
+            <hr>
+
+            <ul class="list-unstyled text-secondary">
+
+              <li>Certifications</li>
+
+              <li>Records</li>
+
+              <li>Verification</li>
+
+              <li>Other Requests</li>
+
+            </ul>
+
+            <button class="btn btn-warning text-white mt-3">
+
+              GET QUEUE NUMBER
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ================= STATUS ================= -->
+
+      <div class="row mt-5">
+
+        <div class="col-lg-12">
+
+          <div class="card lto-card">
+
+            <div class="card-header text-white" style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
+
+              <h5 class="mb-0">
+
+                Current Queue Status
+
+              </h5>
+
+            </div>
+
+            <div class="card-body">
+
+              <div class="row text-center">
+
+                <div class="col-md-4">
+
+                  <h2 id="licensingCount" class="fw-bold text-primary">
+
+                    --
+
+                  </h2>
+
+                  <p>
+
+                    Licensing
+
+                  </p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                  <h2 id="registrationCount" class="fw-bold text-success">
+
+                    --
+
+                  </h2>
+
+                  <p>
+
+                    Registration
+
+                  </p>
+
+                </div>
+
+                <div class="col-md-4">
+
+                  <h2 id="miscCount" class="fw-bold text-warning">
+
+                    --
+
+                  </h2>
+
+                  <p>
+
+                    Miscellaneous
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+
+  <footer>
+
+    <div class="container">
+
+      <strong>
+
+        LAND TRANSPORTATION OFFICE
+
+      </strong>
+
+      <br>
+
+      San Pedro Extension Office
+
+      <br>
+
+      Smart Queue Management System &nbsp;&nbsp;|&nbsp;&nbsp; © 2026
+
+    </div>
+
+  </footer>
+
+  <!-- ==========================================================
+     LTO THERMAL TICKET MODAL
+=========================================================== -->
+
+  <div class="modal fade" id="ticketModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+      <div class="modal-content border-0 shadow-lg">
+
+        <div class="modal-header text-white" style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
+
+          <h5 class="modal-title">
+
+            <i class="bi bi-ticket-perforated-fill me-2"></i>
+
+            Queue Ticket
+
+          </h5>
+
+          <button type="button" class="btn-close btn-close-white" onclick="closeModal()">
+          </button>
+
+        </div>
+
+        <div class="modal-body bg-light">
+
+          <!-- Receipt -->
+
+          <div id="printableReceipt" class="receipt mx-auto">
+
+            <div class="text-center">
+
+              <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg"
+                width="70">
+
+              <h5 class="fw-bold mt-3 mb-0">
+
+                LAND TRANSPORTATION OFFICE
+
+              </h5>
+
+              <div class="small text-secondary">
+
+                Republic of the Philippines
+
+              </div>
+
+              <div class="small">
+
+                Smart Queue Management System
+
+              </div>
+
+            </div>
+
+            <hr>
+
+            <div class="text-center">
+
+              <div class="small text-uppercase">
+
+                Queue Number
+
+              </div>
+
+              <h1 id="ticketNumberDisplay" class="display-1 fw-bold text-primary">
+
+                L-101
+
+              </h1>
+
+            </div>
+
+            <hr>
+
+            <table class="table table-borderless mb-0">
+
+              <tr>
+
+                <td>
+
+                  <strong>Service</strong>
+
+                </td>
+
+                <td class="text-end" id="ticketServiceDisplay">
+
+                  Licensing
+
+                </td>
+
+              </tr>
+
+              <tr>
+
+                <td>
+
+                  <strong>Date</strong>
+
+                </td>
+
+                <td class="text-end" id="ticketDateDisplay">
+
+                  --
+
+                </td>
+
+              </tr>
+
+              <tr>
+
+                <td>
+
+                  <strong>Time</strong>
+
+                </td>
+
+                <td class="text-end" id="ticketTimeDisplay">
+
+                  --
+
+                </td>
+
+              </tr>
+
+            </table>
+
+            <hr>
+
+            <div class="text-center">
+
+              <div id="qrcode" class="mb-3 d-flex justify-content-center">
+              </div>
+
+              <div id="qrText" class="small text-muted">
+
+                L-101
+
+              </div>
+
+            </div>
+
+            <hr>
+
+            <div class="text-center">
+
+              <h6 class="fw-bold">
+
+                PLEASE WAIT FOR YOUR NUMBER
+
+                TO APPEAR ON THE DISPLAY
+
+              </h6>
+
+              <p class="small text-secondary">
+
+                Keep this ticket until your transaction
+                has been completed.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+          <div class="me-auto">
+
+            Closing in
+
+            <strong>
+
+              <span id="countdownTimer">
+
+                5
+
+              </span>
+
+              seconds
+
+            </strong>
+
+          </div>
+
+          <button class="btn btn-outline-secondary" onclick="closeModal()">
+
+            Close
+
+          </button>
+
+          <button class="btn btn-lto-blue" onclick="printTicket()">
+
+            <i class="bi bi-printer-fill me-2"></i>
+
+            Print Ticket
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || (user.role !== 'reception' && user.role !== 'admin')) {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('profileName').textContent = user.fullname;
+      document.getElementById('avatarLetter').textContent = user.fullname.charAt(0);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    });
+
+    let autoCloseTimeout = null;
+    let countdownInterval = null;
+    let bootstrapModal = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      bootstrapModal = new bootstrap.Modal(document.getElementById('ticketModal'), {
+        backdrop: 'static',
+        keyboard: false
+      });
+    });
+
+    async function generateTicket(serviceType) {
+      try {
+        const response = await fetch('/api/tickets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ service_type: serviceType })
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to create ticket');
+        }
+
+        const ticket = await response.json();
+        showTicket(ticket);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function showTicket(ticket) {
+      document.getElementById("ticketNumberDisplay").textContent = ticket.ticket_number;
+      document.getElementById("ticketServiceDisplay").textContent = ticket.service_type;
+
+      const created = new Date(ticket.created_at);
+      document.getElementById("ticketDateDisplay").textContent = created.toLocaleDateString();
+      document.getElementById("ticketTimeDisplay").textContent = created.toLocaleTimeString();
+
+      document.getElementById("qrText").textContent = ticket.ticket_number;
+
+      const qr = document.getElementById("qrcode");
+      qr.innerHTML = "";
+
+      new QRCode(qr, {
+        text: `${ticket.ticket_number}`,
+        width: 120,
+        height: 120,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      bootstrapModal.show();
+
+      let count = 5;
+      document.getElementById('countdownTimer').textContent = count;
+
+      clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        count--;
+        document.getElementById('countdownTimer').textContent = count;
+        if (count <= 0) {
+          closeModal();
+        }
+      }, 1000);
+    }
+
+    function printTicket() {
+      const receipt = document.getElementById("printableReceipt").innerHTML;
+      const printWindow = window.open("", "", "width=420,height=700");
+
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>Queue Ticket</title>
+          <style>
+            body{
+              font-family:Courier New;
+              text-align:center;
+              padding:20px;
+            }
+            table{
+              width:100%;
+            }
+            td{
+              padding:4px;
+            }
+          </style>
+        </head>
+        <body>
+          ${receipt}
+        </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+      closeModal();
+    }
+
+    function closeModal() {
+      clearInterval(countdownInterval);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+    }
+
+    // Bug 5 Fix: Populate live queue counts for Licensing, Registration, Miscellaneous
+    async function loadQueueCounts() {
+      try {
+        const response = await fetch('/api/display/waiting-queue');
+        if (!response.ok) return;
+        const queue = await response.json();
+
+        const counts = { Licensing: 0, Registration: 0, Miscellaneous: 0 };
+        queue.forEach(ticket => {
+          if (counts[ticket.service_type] !== undefined) {
+            counts[ticket.service_type]++;
+          }
+        });
+
+        document.getElementById('licensingCount').textContent = counts.Licensing;
+        document.getElementById('registrationCount').textContent = counts.Registration;
+        document.getElementById('miscCount').textContent = counts.Miscellaneous;
+      } catch (err) {
+        console.error('Failed to load queue counts:', err);
+      }
+    }
+
+    // Load counts on page start, then refresh on real-time queue events
+    loadQueueCounts();
+
+    // Real-time updates via Socket.IO
+    const socket = io();
+    socket.on('queue-updated', loadQueueCounts);
+    socket.on('ticket-created', loadQueueCounts);
+    socket.on('queue-reset', loadQueueCounts);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LTO Queuing System - Display Monitor</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="tv-display-theme d-flex flex-column min-vh-100 overflow-hidden">
+
+  <!-- Audio Enable Banner (Hidden once clicked) -->
+  <div id="audioBanner" class="alert alert-primary text-center m-0 border-0 rounded-0 cursor-pointer text-white d-flex align-items-center justify-content-center gap-2" style="background-color: var(--lto-primary); cursor: pointer; z-index: 1050; position: relative; transition: var(--transition-smooth);">
+    <span class="fs-5">🔊</span> <span class="fw-bold">Click here to enable Audio Announcements</span> for this monitor screen.
+  </div>
+
+  <!-- Navbar / Header -->
+  <nav class="navbar navbar-expand navbar-dark px-4 py-3" style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
+    <div class="container-fluid">
+      <div class="navbar-brand d-flex align-items-center gap-2">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg" alt="LTO Logo" style="width: 45px; height: 45px;">
+        <div>
+          <div class="fw-bold text-white mb-0 h5">LAND TRANSPORTATION OFFICE</div>
+          <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office</div>
+          <div class="small text-white-50" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Real-Time Dispatch Display</div>
+        </div>
+      </div>
+      
+      <div class="collapse navbar-collapse justify-content-end">
+        <div class="fw-bold text-white-50 px-3 py-1.5 bg-dark bg-opacity-50 border border-secondary border-opacity-10 rounded-3" id="liveClock" style="font-size: 0.95rem;">
+          Loading...
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content (Digital Signage layout matching mockup) -->
+  <main class="container my-auto px-4 py-3 flex-grow-1 overflow-auto d-flex flex-column gap-4" style="max-height: calc(100vh - 100px); max-width: 900px;">
+    
+    <!-- Top Block: Now Serving Banner -->
+    <div class="card now-serving-banner text-center p-5 d-flex flex-column align-items-center justify-content-center" id="nowServingPanel">
+      <div class="small text-white-50 text-uppercase fw-bold mb-3" style="letter-spacing: 2px; font-size: 1.1rem;">
+        NOW SERVING
+      </div>
+      <div class="huge-queue-text mb-3" id="nowServingNumber">---</div>
+      <div class="h2 text-white fw-bold mb-0" id="nowServingCounter">
+        Counter --
+      </div>
+    </div>
+
+    <!-- Bottom Block: Waiting Queue Card -->
+    <div class="card lto-card p-4 flex-grow-1 overflow-hidden" style="background-color: #1A1A1A !important; border-color: #2C2C2C !important;">
+      <div class="d-flex align-items-center gap-2 pb-3 border-bottom border-secondary border-opacity-20 mb-2">
+        <span class="fs-5">📋</span>
+        <h3 class="h5 fw-bold text-white mb-0">Waiting Queue</h3>
+      </div>
+      
+      <div class="list-group list-group-flush overflow-y-auto px-1" id="queueList" style="max-height: 40vh;">
+        <div class="text-center text-muted py-5 small">Queue is empty.</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleDateString(undefined, { 
+        weekday: 'short', month: 'short', day: 'numeric' 
+      }) + ' | ' + now.toLocaleTimeString(undefined, {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Audio Unlock
+    let audioEnabled = false;
+    document.getElementById('audioBanner').addEventListener('click', function() {
+      audioEnabled = true;
+      this.style.transform = 'translateY(-100%)';
+      setTimeout(() => this.style.display = 'none', 300);
+      playChimeSynth();
+    });
+
+    // Sound Synth
+    function playChimeSynth() {
+      if (!audioEnabled) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(783.99, ctx.currentTime); // G5
+        gain1.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(659.25, ctx.currentTime + 0.22); // E5
+        gain2.gain.setValueAtTime(0, ctx.currentTime);
+        gain2.gain.setValueAtTime(0.2, ctx.currentTime + 0.22);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.9);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+
+        osc1.start(ctx.currentTime);
+        osc1.stop(ctx.currentTime + 0.6);
+        osc2.start(ctx.currentTime + 0.22);
+        osc2.stop(ctx.currentTime + 0.9);
+      } catch (err) {
+        console.error('Audio failed:', err);
+      }
+    }
+
+    // TTS
+    function announceTicket(ticketNumber, counterNumber) {
+      if (!audioEnabled) return;
+      setTimeout(() => {
+        const letter = ticketNumber.charAt(0);
+        const number = ticketNumber.substring(2);
+        const speechText = `Now serving Ticket: ${letter}, ${number}, at Counter: ${counterNumber}.`;
+        
+        const utterance = new SpeechSynthesisUtterance(speechText);
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+        
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice => voice.lang.includes('en-US') || voice.lang.includes('en-GB'));
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+        window.speechSynthesis.speak(utterance);
+      }, 950);
+    }
+
+    const socket = io();
+
+    async function loadBoardState() {
+      try {
+        const waitResponse = await fetch('/api/display/waiting-queue');
+        const waitingQueue = await waitResponse.json();
+        renderWaitingQueue(waitingQueue);
+
+        const activeResponse = await fetch('/api/display/active-calls');
+        const activeCalls = await activeResponse.json();
+        renderActiveCalls(activeCalls);
+      } catch (err) {
+        console.error('Failed to load board state:', err);
+      }
+    }
+
+    function renderWaitingQueue(queue) {
+      const queueList = document.getElementById('queueList');
+
+      if (queue.length === 0) {
+        queueList.innerHTML = `<div class="text-center text-muted py-5 small">Queue is empty.</div>`;
+        return;
+      }
+
+      queueList.innerHTML = queue.map(ticket => `
+        <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-1 py-3 text-white" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;">
+          <h4 class="mb-0 fw-bold fs-5">${ticket.ticket_number}</h4>
+          <span class="fs-6 text-white-50">${ticket.service_type}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderActiveCalls(calls) {
+      const nowServingNumber = document.getElementById('nowServingNumber');
+      const counterSpan = document.getElementById('nowServingCounter');
+
+      if (calls.length === 0) {
+        nowServingNumber.textContent = '---';
+        counterSpan.textContent = 'Counter --';
+        return;
+      }
+
+      const latestCall = calls[0];
+      nowServingNumber.textContent = latestCall.ticket_number;
+      counterSpan.textContent = `Counter ${latestCall.counter_number}`;
+    }
+
+    socket.on('ticket-called', (data) => {
+      playChimeSynth();
+      announceTicket(data.ticket_number, data.counter_number);
+
+      const mainPanel = document.getElementById('nowServingPanel');
+      mainPanel.classList.add('pulse-border-blue');
+      setTimeout(() => mainPanel.classList.remove('pulse-border-blue'), 4000);
+
+      loadBoardState();
+    });
+
+    socket.on('ticket-created', loadBoardState);
+    socket.on('queue-updated', loadBoardState);
+    socket.on('queue-reset', loadBoardState);
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.getVoices();
+    };
+
+    loadBoardState();
+  </script>
+</body>
+</html>

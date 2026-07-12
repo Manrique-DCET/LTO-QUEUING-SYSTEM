@@ -1,0 +1,26 @@
+{
+  "name": "lto-queuing-system",
+  "version": "1.0.0",
+  "description": "LTO Queuing System with Real-Time Updates, Thermal Printing simulation, and Audio Announcements",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "lto",
+    "queuing",
+    "real-time",
+    "socket.io",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "sqlite3": "^5.1.7"
+  }
+}

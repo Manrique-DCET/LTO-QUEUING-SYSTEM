@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LTO Queue System</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>LAND TRANSPORTATION OFFICE</h1>
+
+<h3>San Pedro Extension Office</h3>
+
+<h4>LTO Queue Management System</h4>
+
+</header>
+
+<div class="container">
+
+<label>Category</label>
+
+<select id="category">
+
+<option value="SP">Student Permit</option>
+<option value="NP">Non Professional License</option>
+<option value="PR">Professional License</option>
+<option value="CO">Conductor License</option>
+<option value="AR">Additional Restriction</option>
+<option value="DO">Dormant</option>
+<option value="RN">Renewal</option>
+<option value="DL">Duplicate License</option>
+<option value="RR">Revision of Records</option>
+<option value="FD">Foreign DL Conversion</option>
+<option value="EN">Enhancement</option>
+<option value="CR">Duplicate CR</option>
+<option value="DP">Duplicate Plate</option>
+<option value="CC">Change Color</option>
+<option value="CE">Change Engine</option>
+<option value="TO">Transfer Ownership</option>
+<option value="PB">Private to For Hire</option>
+<option value="BD">Change Body Design</option>
+<option value="CF">Confirmation</option>
+
+</select>
+
+<label>Priority Lane</label>
+
+<select id="priority">
+
+<option>Regular</option>
+<option>Senior Citizen</option>
+<option>PWD</option>
+<option>Pregnant</option>
+
+</select>
+
+<button class="primary" onclick="generateQueue()">
+
+GET QUEUE NUMBER
+
+</button>
+
+<div class="ticket" id="ticket">
+
+<h2>Your Queue Number</h2>
+
+<h1 id="queue"></h1>
+
+<p id="date"></p>
+
+<button class="success" onclick="printTicket()">
+
+Print Ticket
+
+</button>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,727 @@
+/* =====================================================
+   LTO SMART QUEUE SYSTEM
+   Global Theme
+===================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+
+  /* Official LTO Colors */
+
+  --lto-primary: #003366;
+  --lto-secondary: #0056b3;
+  --lto-success: #198754;
+  --lto-yellow: #ffd54f;
+
+  --lto-white: #FFFFFF;
+  --lto-bg: #eef2f7;
+
+  --lto-dark: #1E293B;
+  --lto-gray: #64748B;
+
+  --danger: #DC3545;
+  --warning: #F59E0B;
+
+  /* Extended Colors */
+  --lto-red: #c0392b;
+  --lto-red-glow: rgba(192, 57, 43, 0.30);
+
+  /* Sizes */
+
+  --radius: 20px;
+
+  --radius-small: 12px;
+
+  --shadow:
+    0 10px 35px rgba(0, 0, 0, .08);
+
+  --shadow-hover:
+    0 18px 40px rgba(0, 51, 102, .15);
+
+  --transition: .30s ease;
+
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+
+  scroll-behavior: smooth;
+
+}
+
+body {
+
+  font-family: "Segoe UI", "Inter", sans-serif;
+
+  background: var(--lto-bg);
+
+  color: var(--lto-dark);
+
+  min-height: 100vh;
+
+}
+
+/* =====================================================
+NAVBAR
+===================================================== */
+
+.lto-header {
+
+  background: linear-gradient(90deg,
+      var(--lto-primary),
+      var(--lto-secondary));
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+
+}
+
+.navbar-brand {
+
+  font-weight: 800;
+
+}
+
+.navbar-brand img {
+
+  width: 52px;
+
+  height: 52px;
+
+}
+
+.navbar {
+
+  padding: 18px 30px;
+
+}
+
+/* =====================================================
+CARDS
+===================================================== */
+
+.lto-card {
+
+  border: none;
+
+  border-radius: var(--radius);
+
+  background: white;
+
+  box-shadow: var(--shadow);
+
+  transition: var(--transition);
+
+}
+
+.lto-card:hover {
+
+  transform: translateY(-4px);
+
+  box-shadow: var(--shadow-hover);
+
+}
+
+/* =====================================================
+BUTTONS
+===================================================== */
+
+.btn {
+
+  border-radius: 14px;
+
+  font-weight: 600;
+
+  transition: .25s;
+
+}
+
+.btn:hover {
+
+  transform: translateY(-2px);
+
+}
+
+.btn-lto-blue {
+
+  background: var(--lto-primary);
+
+  color: white;
+
+  border: none;
+
+}
+
+.btn-lto-blue:hover {
+
+  background: var(--lto-secondary);
+
+  color: white;
+
+}
+
+.btn-success {
+
+  border: none;
+
+}
+
+.btn-danger {
+
+  border: none;
+
+}
+
+/* =====================================================
+FORMS
+===================================================== */
+
+.form-control,
+.form-select {
+
+  border-radius: 14px;
+
+  padding: 12px;
+
+  border: 1px solid #d6dce6;
+
+  transition: .25s;
+
+}
+
+.form-control:focus,
+.form-select:focus {
+
+  border-color: var(--lto-primary);
+
+  box-shadow: 0 0 0 .2rem rgba(0, 56, 168, .18);
+
+}
+
+/* =====================================================
+SERVICE CARDS
+===================================================== */
+
+.service-card {
+
+  cursor: pointer;
+
+  border: none;
+
+  border-radius: 24px;
+
+  transition: .35s;
+
+  overflow: hidden;
+
+}
+
+.service-card:hover {
+
+  transform: translateY(-8px);
+
+  box-shadow:
+
+    0 20px 45px rgba(0, 56, 168, .18);
+
+}
+
+.service-card .fs-1 {
+
+  font-size: 70px !important;
+
+}
+
+/* =====================================================
+DISPLAY PAGE
+===================================================== */
+
+.now-serving-banner {
+
+  background: linear-gradient(135deg,
+      var(--lto-primary),
+      var(--lto-secondary));
+
+  border-radius: 28px;
+
+  color: white;
+
+  box-shadow:
+    0 15px 35px rgba(0, 56, 168, .30);
+
+}
+
+.huge-queue-text {
+
+  font-size: 7rem;
+
+  font-weight: 900;
+
+  letter-spacing: 4px;
+
+  line-height: 1;
+
+}
+
+#queueList {
+
+  border-radius: 20px;
+
+}
+
+#queueList .list-group-item {
+
+  border: none;
+
+  border-bottom: 1px solid #ECECEC;
+
+  padding: 22px;
+
+  transition: .25s;
+
+}
+
+#queueList .list-group-item:hover {
+
+  background: #F8FAFC;
+
+}
+
+/* =====================================================
+ADMIN STATS
+===================================================== */
+
+.stats-card {
+
+  border-radius: 20px;
+
+  padding: 25px;
+
+  color: white;
+
+}
+
+.stats-card h3 {
+
+  font-size: .9rem;
+
+  font-weight: 600;
+
+  opacity: .9;
+
+}
+
+.stats-card h2 {
+
+  font-size: 2.5rem;
+
+  font-weight: 800;
+
+}
+
+.bg-lto {
+
+  background:
+    linear-gradient(135deg,
+      #0038A8,
+      #0052CC);
+
+}
+
+.bg-success-soft {
+
+  background:
+    linear-gradient(135deg,
+      #198754,
+      #28A745);
+
+}
+
+.bg-warning-soft {
+
+  background:
+    linear-gradient(135deg,
+      #F59E0B,
+      #FBBF24);
+
+}
+
+/* =====================================================
+TABLES
+===================================================== */
+
+.table {
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+}
+
+.table thead {
+
+  background: var(--lto-primary);
+
+  color: white;
+
+}
+
+.table th {
+
+  border: none;
+
+}
+
+.table td {
+
+  vertical-align: middle;
+
+}
+
+/* =====================================================
+QUEUE NUMBER
+===================================================== */
+
+.ticket-number {
+
+  font-size: 70px;
+
+  font-weight: 900;
+
+  color: var(--lto-primary);
+
+  letter-spacing: 4px;
+
+}
+
+/* =====================================================
+BADGES
+===================================================== */
+
+.badge {
+
+  border-radius: 30px;
+
+  padding: 8px 14px;
+
+  font-weight: 600;
+
+}
+
+/* =====================================================
+FOOTER
+===================================================== */
+
+footer {
+
+  margin-top: auto;
+
+  background: white;
+
+  border-top: 1px solid #e8edf5;
+
+  padding: 20px;
+
+  text-align: center;
+
+  color: var(--lto-gray);
+
+}
+
+/* =====================================================
+ANIMATIONS
+===================================================== */
+
+.fade-up {
+
+  animation: fadeUp .6s ease;
+
+}
+
+@keyframes fadeUp {
+
+  from {
+
+    opacity: 0;
+
+    transform: translateY(25px);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: translateY(0);
+
+  }
+
+}
+
+.pulse-border-blue {
+
+  animation: pulseBlue 2s infinite;
+
+}
+
+@keyframes pulseBlue {
+
+  0% {
+
+    box-shadow:
+      0 0 0 rgba(0, 56, 168, .2);
+
+  }
+
+  50% {
+
+    box-shadow:
+      0 0 35px rgba(0, 56, 168, .45);
+
+  }
+
+  100% {
+
+    box-shadow:
+      0 0 0 rgba(0, 56, 168, .2);
+
+  }
+
+}
+
+.scale-in {
+
+  animation: scaleIn .45s;
+
+}
+
+@keyframes scaleIn {
+
+  from {
+
+    opacity: 0;
+
+    transform: scale(.9);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: scale(1);
+
+  }
+
+}
+
+/* =====================================================
+SCROLLBAR
+===================================================== */
+
+::-webkit-scrollbar {
+
+  width: 10px;
+
+}
+
+::-webkit-scrollbar-thumb {
+
+  background: #B5C4E3;
+
+  border-radius: 10px;
+
+}
+
+::-webkit-scrollbar-thumb:hover {
+
+  background: var(--lto-primary);
+
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media(max-width:992px) {
+
+  .huge-queue-text {
+
+    font-size: 5rem;
+
+  }
+
+  .ticket-number {
+
+    font-size: 52px;
+
+  }
+
+}
+
+@media(max-width:768px) {
+
+  .navbar {
+
+    padding: 15px;
+
+  }
+
+  .huge-queue-text {
+
+    font-size: 4rem;
+
+  }
+
+  .service-card .fs-1 {
+
+    font-size: 52px !important;
+
+  }
+
+  .ticket-number {
+
+    font-size: 42px;
+
+  }
+
+}
+
+/* =======================================================
+THERMAL RECEIPT
+======================================================= */
+
+.receipt {
+
+  width: 320px;
+
+  background: white;
+
+  padding: 30px;
+
+  font-family: "Courier New", monospace;
+
+  border: 3px dashed var(--lto-primary);
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+
+}
+
+.card-leftborder {
+  border-left: 6px solid var(--lto-primary) !important;
+  background-color: #f7f9fc !important;
+  border-radius: 12px !important;
+}
+
+.receipt hr {
+
+  border-top: 2px dashed #CFCFCF;
+
+  margin: 18px 0;
+
+}
+
+.receipt table {
+
+  font-size: 15px;
+
+}
+
+.receipt h1 {
+
+  letter-spacing: 4px;
+
+  font-size: 72px;
+
+}
+
+.receipt img {
+
+  display: block;
+
+  margin: auto;
+
+}
+
+#printableReceipt {
+
+  animation: fadeUp .5s;
+
+}
+
+/* =====================================================
+TV DISPLAY THEME (display.html)
+===================================================== */
+
+.tv-display-theme {
+
+  background: #0f1117;
+
+  color: white;
+
+}
+
+.tv-display-theme .lto-card {
+
+  background: #1A1A1A !important;
+
+  border-color: #2C2C2C !important;
+
+  color: white;
+
+}
+
+/* =====================================================
+ADMIN BAR CHART
+===================================================== */
+
+.bar-chart-container {
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  height: 180px;
+
+  gap: 8px;
+
+  padding: 10px 0 0;
+
+}
+
+.bar-column {
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex: 1;
+
+  height: 100%;
+
+  gap: 4px;
+
+}
+
+.bar-item {
+
+  width: 100%;
+
+  border-radius: 6px 6px 0 0;
+
+  min-height: 4px;
+
+  transition: height 0.4s ease;
+
+}

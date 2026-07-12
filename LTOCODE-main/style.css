@@ -1,0 +1,328 @@
+/* ===========================
+   LTO QUEUE MANAGEMENT SYSTEM
+   Professional Theme
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+}
+
+body{
+    background:#eef2f7;
+    color:#333;
+}
+
+/* HEADER */
+
+header{
+    background:linear-gradient(90deg,#003366,#0056b3);
+    color:#fff;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,.25);
+}
+
+header h1{
+    font-size:34px;
+    letter-spacing:1px;
+}
+
+header h3{
+    margin-top:8px;
+    color:#ffd54f;
+}
+
+header h4{
+    font-weight:normal;
+    margin-top:5px;
+}
+
+/* CONTAINER */
+
+.container{
+    width:95%;
+    max-width:900px;
+    margin:35px auto;
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+/* CARD */
+
+.card{
+    background:#f7f9fc;
+    border-left:6px solid #003366;
+    border-radius:12px;
+    padding:20px;
+    margin-top:20px;
+}
+
+/* LABEL */
+
+label{
+    display:block;
+    margin-top:20px;
+    font-weight:600;
+    color:#003366;
+}
+
+/* INPUT */
+
+select,
+input{
+    width:100%;
+    padding:14px;
+    margin-top:8px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+    transition:.3s;
+}
+
+select:focus,
+input:focus{
+    border-color:#003366;
+    outline:none;
+    box-shadow:0 0 8px rgba(0,51,102,.3);
+}
+
+/* BUTTON */
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:25px;
+    border:none;
+    border-radius:8px;
+    font-size:17px;
+    cursor:pointer;
+    transition:.3s;
+    font-weight:bold;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+/* BUTTON COLORS */
+
+.primary{
+    background:#003366;
+    color:white;
+}
+
+.primary:hover{
+    background:#0056b3;
+}
+
+.success{
+    background:#28a745;
+    color:white;
+}
+
+.success:hover{
+    background:#218838;
+}
+
+.warning{
+    background:#ffc107;
+    color:black;
+}
+
+.warning:hover{
+    background:#e0a800;
+}
+
+.danger{
+    background:#dc3545;
+    color:white;
+}
+
+.danger:hover{
+    background:#b52a37;
+}
+
+/* QUEUE TICKET */
+
+.ticket{
+    margin-top:30px;
+    display:none;
+    border:3px dashed #003366;
+    border-radius:10px;
+    padding:25px;
+    text-align:center;
+    background:white;
+}
+
+.ticket h1{
+    font-size:60px;
+    color:#d32f2f;
+    margin:15px 0;
+}
+
+.ticket h2{
+    color:#003366;
+}
+
+.ticket p{
+    margin-top:10px;
+}
+
+/* NOW SERVING */
+
+.nowServing{
+    text-align:center;
+    background:#003366;
+    color:white;
+    padding:25px;
+    border-radius:12px;
+    margin-top:20px;
+}
+
+.nowServing h2{
+    font-size:60px;
+    color:#ffd54f;
+}
+
+/* DISPLAY SCREEN */
+
+.display{
+    text-align:center;
+    color:white;
+}
+
+.display .queue{
+    font-size:120px;
+    color:#FFD700;
+    font-weight:bold;
+    margin:20px 0;
+    text-shadow:2px 2px 8px rgba(0,0,0,.5);
+}
+
+/* HISTORY */
+
+.history{
+    margin-top:25px;
+}
+
+.history ul{
+    list-style:none;
+}
+
+.history li{
+    background:#f4f6f8;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:8px;
+    border-left:5px solid #003366;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th{
+    background:#003366;
+    color:white;
+    padding:12px;
+}
+
+table td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+}
+
+/* CLOCK */
+
+.clock{
+    text-align:center;
+    margin-top:20px;
+    font-size:26px;
+    font-weight:bold;
+    color:#003366;
+}
+
+/* STATUS */
+
+.status-waiting{
+    color:#ff9800;
+    font-weight:bold;
+}
+
+.status-serving{
+    color:#28a745;
+    font-weight:bold;
+}
+
+.status-done{
+    color:#555;
+}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    margin-top:40px;
+    color:#777;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+header h1{
+    font-size:25px;
+}
+
+.ticket h1{
+    font-size:40px;
+}
+
+.display .queue{
+    font-size:70px;
+}
+
+.nowServing h2{
+    font-size:40px;
+}
+
+button{
+    font-size:15px;
+}
+
+.container{
+    padding:20px;
+}
+
+}
+
+/* PRINT */
+
+@media print{
+
+body{
+    background:white;
+}
+
+header,
+button,
+footer{
+    display:none;
+}
+
+.ticket{
+    display:block;
+    border:2px solid black;
+    box-shadow:none;
+}
+
+}

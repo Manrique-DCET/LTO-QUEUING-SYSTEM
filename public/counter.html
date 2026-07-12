@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LTO Queuing System - Counter Staff</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand navbar-dark lto-header px-4 py-3">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg" alt="LTO Logo" style="width: 45px; height: 45px;">
+        <div>
+          <div class="fw-bold text-white mb-0 h5">LAND TRANSPORTATION OFFICE</div>
+          <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office</div>
+          <div class="small text-white-50" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Counter Officer Desk</div>
+        </div>
+      </a>
+      
+      <div class="collapse navbar-collapse justify-content-end">
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-none d-sm-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1.5 rounded-pill border border-white border-opacity-10">
+            <div class="user-avatar" id="avatarLetter" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; color: var(--lto-primary);">S</div>
+            <div class="d-flex flex-column text-start">
+              <span class="text-white small fw-bold" id="profileName" style="font-size: 0.8rem;">Counter Staff</span>
+              <span class="text-white-50" style="font-size: 0.6rem; text-transform: uppercase;">Officer Mode</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-light px-3" id="logoutBtn">Logout 🚪</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container my-auto py-5">
+    <div class="row g-4 align-items-start">
+      
+      <!-- Left Column: Settings & Stats (4 Cols) -->
+      <div class="col-12 col-lg-4 d-flex flex-column gap-4">
+        
+        <!-- Settings Card -->
+        <div class="card lto-card p-4">
+          <h3 class="h5 fw-bold text-dark mb-3 border-bottom border-light pb-2" style="color: var(--lto-primary) !important;">Desk Settings</h3>
+
+          <!-- Counter Number Select -->
+          <div class="mb-3">
+            <label for="counterNumSelect" class="form-label small text-secondary fw-semibold">Assign Counter Number</label>
+            <select id="counterNumSelect" class="form-select text-dark border-secondary-subtle py-2">
+              <option value="1">Counter 1</option>
+              <option value="2">Counter 2</option>
+              <option value="3">Counter 3</option>
+              <option value="4">Counter 4</option>
+              <option value="5">Counter 5</option>
+            </select>
+          </div>
+
+          <!-- Services Selector Switches -->
+          <div class="mb-2">
+            <label class="form-label small text-secondary fw-semibold mb-2">Services You Handle</label>
+            <div class="d-flex flex-column gap-2">
+              <div class="form-check form-switch bg-light rounded border border-light p-2 px-5">
+                <input class="form-check-input ms-[-2.5em] float-start" type="checkbox" id="srvLicensing" checked>
+                <label class="form-check-label text-dark small" for="srvLicensing">Licensing Services</label>
+              </div>
+              <div class="form-check form-switch bg-light rounded border border-light p-2 px-5">
+                <input class="form-check-input ms-[-2.5em] float-start" type="checkbox" id="srvRegistration" checked>
+                <label class="form-check-label text-dark small" for="srvRegistration">Registration Services</label>
+              </div>
+              <div class="form-check form-switch bg-light rounded border border-light p-2 px-5">
+                <input class="form-check-input ms-[-2.5em] float-start" type="checkbox" id="srvMiscellaneous" checked>
+                <label class="form-check-label text-dark small" for="srvMiscellaneous">Miscellaneous Services</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Queue Monitor Stats Card -->
+        <div class="card lto-card p-4">
+          <h3 class="h5 fw-bold text-dark mb-3 border-bottom border-light pb-2" style="color: var(--lto-primary) !important;">Waiting Stats</h3>
+          <div class="d-flex flex-column gap-2 text-dark">
+            <div class="d-flex justify-content-between align-items-center py-1">
+              <span class="small text-secondary">Matching your services:</span>
+              <span class="badge bg-warning bg-opacity-15 text-warning fw-bold fs-6" id="waitingMatchCount" style="color: var(--lto-yellow) !important; border: 1px solid rgba(245, 158, 11, 0.2);">0</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center py-1">
+              <span class="small text-secondary">Total waiting today:</span>
+              <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold fs-6" id="waitingTotalCount" style="border: 1px solid rgba(0,0,0,0.1);">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Control Console Dashboard (8 Cols) -->
+      <div class="col-12 col-lg-8 h-100">
+        <div class="card lto-card p-4 p-md-5 d-flex flex-column align-items-center justify-content-center text-center" style="min-height: 480px;" id="servingContainer">
+          
+          <!-- State 1: Active Serving Mode -->
+          <div id="servingState" style="display: none; width: 100%;">
+            <div class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-4 py-2 fs-7 mb-4 text-uppercase fw-bold" style="letter-spacing: 1px;">
+              Currently Serving
+            </div>
+
+            <div class="mb-4">
+              <h2 class="display-2 fw-extrabold text-dark mb-1" id="servingNumber" style="letter-spacing: -1px; color: var(--lto-primary) !important;">---</h2>
+              <p class="text-secondary lead mb-0" id="servingType">Licensing Renewal</p>
+            </div>
+
+            <div class="alert alert-warning d-inline-flex align-items-center gap-2 px-4 py-2.5 rounded-pill mb-5 fs-6 fw-bold border border-warning-subtle text-warning-emphasis" style="background: rgba(245, 158, 11, 0.05);">
+              <span>⏱️</span> Elapsed Time: <span id="servingTimer">00:00</span>
+            </div>
+
+            <div class="row g-3 justify-content-center mx-auto" style="max-width: 550px;">
+              <div class="col-12 col-sm-4">
+                <button class="btn btn-outline-warning w-100 py-3 fw-bold" onclick="recallCurrent()">
+                  📢 Recall
+                </button>
+              </div>
+              <div class="col-12 col-sm-4">
+                <button class="btn btn-success w-100 py-3 fw-bold border-0 text-white" onclick="completeCurrent()" style="background-color: var(--lto-success); box-shadow: 0 4px 15px rgba(25, 135, 84, 0.25);">
+                  Complete ✅
+                </button>
+              </div>
+              <div class="col-12 col-sm-4">
+                <button class="btn btn-danger w-100 py-3 fw-bold border-0" onclick="skipCurrent()" style="background-color: var(--lto-red); box-shadow: 0 4px 15px var(--lto-red-glow);">
+                  Skip ⏭️
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- State 2: Idle Mode -->
+          <div id="idleState" class="d-flex flex-column align-items-center text-dark">
+            <div class="fs-1 mb-3">💤</div>
+            <h3 class="h4 fw-bold mb-2">Idle Terminal</h3>
+            <p class="text-secondary small mb-4" style="max-width: 440px;">Select your counter number and handled services in the sidebar, then click call next when ready to serve a customer.</p>
+            <button class="btn btn-lg btn-lto-blue px-5 py-3 fw-bold fs-5" onclick="callNextTicket()" id="callNextBtn">
+              🚀 Call Next Customer
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="mt-auto py-4 text-center text-secondary border-top border-secondary-subtle bg-white">
+    <strong>LAND TRANSPORTATION OFFICE</strong> &mdash; San Pedro Extension Office &nbsp;|&nbsp; Smart Queue Management System &copy; 2026
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || (user.role !== 'staff' && user.role !== 'admin')) {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('profileName').textContent = user.fullname;
+      document.getElementById('avatarLetter').textContent = user.fullname.charAt(0);
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    });
+
+    const socket = io();
+
+    let activeTicket = null;
+    let timerInterval = null;
+
+    const counterSelect = document.getElementById('counterNumSelect');
+    const chkLicensing = document.getElementById('srvLicensing');
+    const chkRegistration = document.getElementById('srvRegistration');
+    const chkMiscellaneous = document.getElementById('srvMiscellaneous');
+
+    if (localStorage.getItem('staff_counter')) {
+      counterSelect.value = localStorage.getItem('staff_counter');
+    }
+    if (localStorage.getItem('staff_services')) {
+      const savedServices = JSON.parse(localStorage.getItem('staff_services'));
+      chkLicensing.checked = savedServices.includes('Licensing');
+      chkRegistration.checked = savedServices.includes('Registration');
+      chkMiscellaneous.checked = savedServices.includes('Miscellaneous');
+    }
+
+    function saveConfigs() {
+      localStorage.setItem('staff_counter', counterSelect.value);
+      const services = [];
+      if (chkLicensing.checked) services.push('Licensing');
+      if (chkRegistration.checked) services.push('Registration');
+      if (chkMiscellaneous.checked) services.push('Miscellaneous');
+      localStorage.setItem('staff_services', JSON.stringify(services));
+      loadQueueStats();
+    }
+
+    counterSelect.addEventListener('change', saveConfigs);
+    chkLicensing.addEventListener('change', saveConfigs);
+    chkRegistration.addEventListener('change', saveConfigs);
+    chkMiscellaneous.addEventListener('change', saveConfigs);
+
+    function getSelectedServices() {
+      const services = [];
+      if (chkLicensing.checked) services.push('Licensing');
+      if (chkRegistration.checked) services.push('Registration');
+      if (chkMiscellaneous.checked) services.push('Miscellaneous');
+      return services;
+    }
+
+    async function loadQueueStats() {
+      try {
+        const response = await fetch('/api/display/waiting-queue');
+        const waitingQueue = await response.json();
+        const services = getSelectedServices();
+        const matchingTickets = waitingQueue.filter(t => services.includes(t.service_type));
+
+        document.getElementById('waitingTotalCount').textContent = waitingQueue.length;
+        document.getElementById('waitingMatchCount').textContent = matchingTickets.length;
+      } catch (err) {
+        console.error('Queue stats failed:', err);
+      }
+    }
+
+    async function checkActiveTicket() {
+      try {
+        const response = await fetch(`/api/counter/active/${user.id}`);
+        const ticket = await response.json();
+        if (ticket) {
+          showServingState(ticket);
+        } else {
+          showIdleState();
+        }
+      } catch (err) {
+        console.error('Active check failed:', err);
+      }
+    }
+
+    function startTimer(startTimeString) {
+      clearInterval(timerInterval);
+      const startTime = startTimeString ? new Date(startTimeString) : new Date();
+      
+      function updateTimer() {
+        const now = new Date();
+        const diff = Math.floor((now - startTime) / 1000);
+        const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+        const secs = String(diff % 60).padStart(2, '0');
+        document.getElementById('servingTimer').textContent = `${mins}:${secs}`;
+      }
+      
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function showServingState(ticket) {
+      activeTicket = ticket;
+      document.getElementById('servingNumber').textContent = ticket.ticket_number;
+      document.getElementById('servingType').textContent = ticket.service_type;
+      document.getElementById('idleState').setAttribute('style', 'display: none !important;');
+      document.getElementById('servingState').setAttribute('style', 'display: block !important;');
+      startTimer(ticket.called_at);
+    }
+
+    function showIdleState() {
+      activeTicket = null;
+      clearInterval(timerInterval);
+      document.getElementById('servingState').setAttribute('style', 'display: none !important;');
+      document.getElementById('idleState').setAttribute('style', 'display: flex !important;');
+    }
+
+    async function callNextTicket() {
+      const services = getSelectedServices();
+      const counterNum = counterSelect.value;
+
+      if (services.length === 0) {
+        alert('Please select at least one service category to handle!');
+        return;
+      }
+
+      const callNextBtn = document.getElementById('callNextBtn');
+      callNextBtn.disabled = true;
+      callNextBtn.textContent = 'Calling Next...';
+
+      try {
+        const response = await fetch('/api/counter/call-next', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            counter_number: parseInt(counterNum, 10),
+            user_id: user.id,
+            services: services
+          })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || 'Failed to dispatch');
+
+        if (data.ticket) {
+          showServingState(data.ticket);
+        } else {
+          alert('No tickets waiting in the queue matching your configurations.');
+          showIdleState();
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        callNextBtn.disabled = false;
+        callNextBtn.textContent = '🚀 Call Next Customer';
+      }
+    }
+
+    async function recallCurrent() {
+      if (!activeTicket) return;
+      try {
+        const response = await fetch('/api/counter/recall', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket_id: activeTicket.id })
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to recall');
+        }
+      } catch (err) {
+        alert('Recall failed: ' + err.message);
+      }
+    }
+
+    async function completeCurrent() {
+      if (!activeTicket) return;
+      try {
+        const response = await fetch('/api/counter/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket_id: activeTicket.id })
+        });
+        if (response.ok) {
+          showIdleState();
+          loadQueueStats();
+        } else {
+          const data = await response.json();
+          throw new Error(data.error || 'Complete failed');
+        }
+      } catch (err) {
+        alert('Action failed: ' + err.message);
+      }
+    }
+
+    async function skipCurrent() {
+      if (!activeTicket) return;
+      try {
+        const response = await fetch('/api/counter/skip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket_id: activeTicket.id })
+        });
+        if (response.ok) {
+          showIdleState();
+          loadQueueStats();
+        } else {
+          const data = await response.json();
+          throw new Error(data.error || 'Skip failed');
+        }
+      } catch (err) {
+        alert('Action failed: ' + err.message);
+      }
+    }
+
+    socket.on('ticket-created', loadQueueStats);
+    socket.on('queue-updated', loadQueueStats);
+    socket.on('queue-reset', () => {
+      showIdleState();
+      loadQueueStats();
+    });
+
+    loadQueueStats();
+    checkActiveTicket();
+  </script>
+</body>
+</html>
