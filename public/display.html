@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,27 +10,38 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body class="tv-display-theme d-flex flex-column min-vh-100 overflow-hidden">
 
   <!-- Audio Enable Banner (Hidden once clicked) -->
-  <div id="audioBanner" class="alert alert-primary text-center m-0 border-0 rounded-0 cursor-pointer text-white d-flex align-items-center justify-content-center gap-2" style="background-color: var(--lto-primary); cursor: pointer; z-index: 1050; position: relative; transition: var(--transition-smooth);">
-    <span class="fs-5">🔊</span> <span class="fw-bold">Click here to enable Audio Announcements</span> for this monitor screen.
+  <div id="audioBanner"
+    class="alert alert-primary text-center m-0 border-0 rounded-0 cursor-pointer text-white d-flex align-items-center justify-content-center gap-2"
+    style="background-color: var(--lto-primary); cursor: pointer; z-index: 1050; position: relative; transition: var(--transition-smooth);">
+    <span class="fs-5">🔊</span> <span class="fw-bold">Click here to enable Audio Announcements</span> for this monitor
+    screen.
   </div>
 
   <!-- Navbar / Header -->
-  <nav class="navbar navbar-expand navbar-dark px-4 py-3" style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
+  <nav class="navbar navbar-expand navbar-dark px-4 py-3"
+    style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
     <div class="container-fluid">
       <div class="navbar-brand d-flex align-items-center gap-2">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg" alt="LTO Logo" style="width: 45px; height: 45px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg"
+          alt="LTO Logo" style="width: 45px; height: 45px;">
         <div>
           <div class="fw-bold text-white mb-0 h5">LAND TRANSPORTATION OFFICE</div>
-          <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office</div>
-          <div class="small text-white-50" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Real-Time Dispatch Display</div>
+          <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office
+          </div>
+          <div class="small text-white-50"
+            style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Real-Time Dispatch Display
+          </div>
         </div>
       </div>
-      
+
       <div class="collapse navbar-collapse justify-content-end">
-        <div class="fw-bold text-white-50 px-3 py-1.5 bg-dark bg-opacity-50 border border-secondary border-opacity-10 rounded-3" id="liveClock" style="font-size: 0.95rem;">
+        <div
+          class="fw-bold text-white-50 px-3 py-1.5 bg-dark bg-opacity-50 border border-secondary border-opacity-10 rounded-3"
+          id="liveClock" style="font-size: 0.95rem;">
           Loading...
         </div>
       </div>
@@ -37,28 +49,106 @@
   </nav>
 
   <!-- Main Content (Digital Signage layout matching mockup) -->
-  <main class="container my-auto px-4 py-3 flex-grow-1 overflow-auto d-flex flex-column gap-4" style="max-height: calc(100vh - 100px); max-width: 900px;">
-    
-    <!-- Top Block: Now Serving Banner -->
-    <div class="card now-serving-banner text-center p-5 d-flex flex-column align-items-center justify-content-center" id="nowServingPanel">
-      <div class="small text-white-50 text-uppercase fw-bold mb-3" style="letter-spacing: 2px; font-size: 1.1rem;">
-        NOW SERVING
+  <main class="container-fluid my-auto px-4 py-3 flex-grow-1 overflow-auto d-flex flex-column gap-4"
+    style="max-height: calc(100vh - 100px); max-width: 1250px;">
+
+    <!-- Top Block: Now Serving Row (3 Columns) -->
+    <div class="row g-4" id="nowServingContainer">
+      <!-- Licensing Now Serving -->
+      <div class="col-md-4">
+        <div
+          class="card now-serving-banner now-serving-licensing text-center p-4 d-flex flex-column align-items-center justify-content-center h-100"
+          id="nowServingLicensingPanel" style="border-radius: 24px;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-2" style="letter-spacing: 2px; font-size: 0.95rem;">
+            Licensing Now Serving
+          </div>
+          <div class="huge-queue-text mb-2" id="nowServingLicensingNumber" style="font-size: 4.5rem; line-height: 1;">
+            ---</div>
+          <div class="h3 text-white fw-bold mb-0" id="nowServingLicensingCounter">
+            Window --
+          </div>
+        </div>
       </div>
-      <div class="huge-queue-text mb-3" id="nowServingNumber">---</div>
-      <div class="h2 text-white fw-bold mb-0" id="nowServingCounter">
-        Counter --
+
+      <!-- Registration & Misc Now Serving -->
+      <div class="col-md-4">
+        <div
+          class="card now-serving-banner now-serving-registration text-center p-4 d-flex flex-column align-items-center justify-content-center h-100"
+          id="nowServingRegistrationPanel" style="border-radius: 24px;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-2" style="letter-spacing: 2px; font-size: 0.95rem;">
+            Registration & Misc. Now Serving
+          </div>
+          <div class="huge-queue-text mb-2" id="nowServingRegistrationNumber"
+            style="font-size: 4.5rem; line-height: 1;">---</div>
+          <div class="h3 text-white fw-bold mb-0" id="nowServingRegistrationCounter">
+            Window --
+          </div>
+        </div>
+      </div>
+
+      <!-- LETAS Now Serving -->
+      <div class="col-md-4">
+        <div
+          class="card now-serving-banner now-serving-letas text-center p-4 d-flex flex-column align-items-center justify-content-center h-100"
+          id="nowServingLETASPanel" style="border-radius: 24px;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-2" style="letter-spacing: 2px; font-size: 0.95rem;">
+            LETAS Now Serving
+          </div>
+          <div class="huge-queue-text mb-2" id="nowServingLETASNumber" style="font-size: 4.5rem; line-height: 1;">---
+          </div>
+          <div class="h3 text-white fw-bold mb-0" id="nowServingLETASCounter">
+            Window --
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Bottom Block: Waiting Queue Card -->
-    <div class="card lto-card p-4 flex-grow-1 overflow-hidden" style="background-color: #1A1A1A !important; border-color: #2C2C2C !important;">
-      <div class="d-flex align-items-center gap-2 pb-3 border-bottom border-secondary border-opacity-20 mb-2">
+    <div class="card lto-card p-4 flex-grow-1 overflow-hidden"
+      style="background-color: #1A1A1A !important; border-color: #2C2C2C !important;">
+      <div class="d-flex align-items-center gap-2 pb-3 border-bottom border-secondary border-opacity-20 mb-3">
         <span class="fs-5">📋</span>
         <h3 class="h5 fw-bold text-white mb-0">Waiting Queue</h3>
       </div>
-      
-      <div class="list-group list-group-flush overflow-y-auto px-1" id="queueList" style="max-height: 40vh;">
-        <div class="text-center text-muted py-5 small">Queue is empty.</div>
+
+      <div class="row g-4 flex-grow-1 overflow-hidden">
+        <!-- Licensing Column -->
+        <div class="col-md-4 d-flex flex-column border-end border-secondary border-opacity-20"
+          style="min-height: 35vh;">
+          <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-primary border-opacity-30">
+            <span class="badge bg-primary text-white">L</span>
+            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider">Licensing</h4>
+          </div>
+          <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueLicensing"
+            style="max-height: 35vh;">
+            <div class="text-center text-muted py-4 small">Queue is empty.</div>
+          </div>
+        </div>
+
+        <!-- Registration & Misc Column -->
+        <div class="col-md-4 d-flex flex-column border-end border-secondary border-opacity-20"
+          style="min-height: 35vh;">
+          <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-success border-opacity-30">
+            <span class="badge bg-success text-white">R / M</span>
+            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider">Registration & Misc.</h4>
+          </div>
+          <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueRegistration"
+            style="max-height: 35vh;">
+            <div class="text-center text-muted py-4 small">Queue is empty.</div>
+          </div>
+        </div>
+
+        <!-- LETAS Column -->
+        <div class="col-md-4 d-flex flex-column" style="min-height: 35vh;">
+          <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-warning border-opacity-30">
+            <span class="badge bg-warning text-dark">S / Q</span>
+            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider">LETAS</h4>
+          </div>
+          <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueLETAS"
+            style="max-height: 35vh;">
+            <div class="text-center text-muted py-4 small">Queue is empty.</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -68,8 +158,8 @@
     // Clock
     function updateClock() {
       const now = new Date();
-      document.getElementById('liveClock').textContent = now.toLocaleDateString(undefined, { 
-        weekday: 'short', month: 'short', day: 'numeric' 
+      document.getElementById('liveClock').textContent = now.toLocaleDateString(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric'
       }) + ' | ' + now.toLocaleTimeString(undefined, {
         hour: '2-digit', minute: '2-digit', second: '2-digit'
       });
@@ -79,7 +169,7 @@
 
     // Audio Unlock
     let audioEnabled = false;
-    document.getElementById('audioBanner').addEventListener('click', function() {
+    document.getElementById('audioBanner').addEventListener('click', function () {
       audioEnabled = true;
       this.style.transform = 'translateY(-100%)';
       setTimeout(() => this.style.display = 'none', 300);
@@ -99,7 +189,7 @@
         gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
         osc1.connect(gain1);
         gain1.connect(ctx.destination);
-        
+
         const osc2 = ctx.createOscillator();
         const gain2 = ctx.createGain();
         osc2.type = 'sine';
@@ -126,11 +216,11 @@
         const letter = ticketNumber.charAt(0);
         const number = ticketNumber.substring(2);
         const speechText = `Now serving Ticket: ${letter}, ${number}, at Counter: ${counterNumber}.`;
-        
+
         const utterance = new SpeechSynthesisUtterance(speechText);
         utterance.rate = 0.95;
         utterance.pitch = 1.0;
-        
+
         const voices = window.speechSynthesis.getVoices();
         const preferredVoice = voices.find(voice => voice.lang.includes('en-US') || voice.lang.includes('en-GB'));
         if (preferredVoice) {
@@ -157,43 +247,99 @@
     }
 
     function renderWaitingQueue(queue) {
-      const queueList = document.getElementById('queueList');
+      const licensingList = document.getElementById('queueLicensing');
+      const registrationList = document.getElementById('queueRegistration');
+      const letasList = document.getElementById('queueLETAS');
 
-      if (queue.length === 0) {
-        queueList.innerHTML = `<div class="text-center text-muted py-5 small">Queue is empty.</div>`;
-        return;
-      }
+      // Filter queue items by service category
+      const licensingQueue = queue.filter(t => t.service_type === 'Licensing');
+      const registrationQueue = queue.filter(t => t.service_type === 'Registration' || t.service_type === 'Miscellaneous');
+      const letasQueue = queue.filter(t => t.service_type === 'Settlement' || t.service_type === 'Query');
 
-      queueList.innerHTML = queue.map(ticket => `
-        <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-1 py-3 text-white" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;">
-          <h4 class="mb-0 fw-bold fs-5">${ticket.ticket_number}</h4>
-          <span class="fs-6 text-white-50">${ticket.service_type}</span>
-        </div>
-      `).join('');
+      // Helper function to render a list or "empty" message
+      const getQueueHTML = (subQueue) => {
+        if (subQueue.length === 0) {
+          return `<div class="text-center text-muted py-4 small">Queue is empty.</div>`;
+        }
+        return subQueue.map(ticket => {
+          const label = ticket.concern || ticket.service_type;
+          return `
+            <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-1 py-3 text-white" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;">
+              <h4 class="mb-0 fw-bold fs-5">${ticket.ticket_number}</h4>
+              <span class="fs-6 text-white-50 text-end" style="max-width: 60%; word-break: break-word;">${label}</span>
+            </div>
+          `;
+        }).join('');
+      };
+
+      // Populate each column
+      licensingList.innerHTML = getQueueHTML(licensingQueue);
+      registrationList.innerHTML = getQueueHTML(registrationQueue);
+      letasList.innerHTML = getQueueHTML(letasQueue);
     }
 
     function renderActiveCalls(calls) {
-      const nowServingNumber = document.getElementById('nowServingNumber');
-      const counterSpan = document.getElementById('nowServingCounter');
+      const licensingNumber = document.getElementById('nowServingLicensingNumber');
+      const licensingCounter = document.getElementById('nowServingLicensingCounter');
+      const registrationNumber = document.getElementById('nowServingRegistrationNumber');
+      const registrationCounter = document.getElementById('nowServingRegistrationCounter');
+      const letasNumber = document.getElementById('nowServingLETASNumber');
+      const letasCounter = document.getElementById('nowServingLETASCounter');
 
-      if (calls.length === 0) {
-        nowServingNumber.textContent = '---';
-        counterSpan.textContent = 'Counter --';
-        return;
+      // Filter active calls by category
+      const licensingActive = calls.find(t => t.service_type === 'Licensing');
+      const registrationActive = calls.find(t => t.service_type === 'Registration' || t.service_type === 'Miscellaneous');
+      const letasActive = calls.find(t => t.service_type === 'Settlement' || t.service_type === 'Query');
+
+      // Populate Licensing
+      if (licensingActive) {
+        licensingNumber.textContent = licensingActive.ticket_number;
+        licensingCounter.textContent = `Counter ${licensingActive.counter_number}`;
+      } else {
+        licensingNumber.textContent = '---';
+        licensingCounter.textContent = 'Counter --';
       }
 
-      const latestCall = calls[0];
-      nowServingNumber.textContent = latestCall.ticket_number;
-      counterSpan.textContent = `Counter ${latestCall.counter_number}`;
+      // Populate Registration & Misc.
+      if (registrationActive) {
+        registrationNumber.textContent = registrationActive.ticket_number;
+        registrationCounter.textContent = `Counter ${registrationActive.counter_number}`;
+      } else {
+        registrationNumber.textContent = '---';
+        registrationCounter.textContent = 'Counter --';
+      }
+
+      // Populate LETAS
+      if (letasActive) {
+        letasNumber.textContent = letasActive.ticket_number;
+        letasCounter.textContent = `Counter ${letasActive.counter_number}`;
+      } else {
+        letasNumber.textContent = '---';
+        letasCounter.textContent = 'Counter --';
+      }
     }
 
     socket.on('ticket-called', (data) => {
       playChimeSynth();
       announceTicket(data.ticket_number, data.counter_number);
 
-      const mainPanel = document.getElementById('nowServingPanel');
-      mainPanel.classList.add('pulse-border-blue');
-      setTimeout(() => mainPanel.classList.remove('pulse-border-blue'), 4000);
+      // Determine which panel to pulse
+      let panelId = 'nowServingLicensingPanel';
+      let pulseClass = 'pulse-border-blue';
+
+      if (data.service_type === 'Registration' || data.service_type === 'Miscellaneous') {
+        panelId = 'nowServingRegistrationPanel';
+        pulseClass = 'pulse-border-green';
+      } else if (data.service_type === 'Settlement' || data.service_type === 'Query') {
+        panelId = 'nowServingLETASPanel';
+        pulseClass = 'pulse-border-yellow';
+      }
+
+      const targetPanel = document.getElementById(panelId);
+      if (targetPanel) {
+        targetPanel.classList.add(pulseClass);
+        setTimeout(() => targetPanel.classList.remove(pulseClass), 4000);
+      }
 
       loadBoardState();
     });
@@ -209,4 +355,5 @@
     loadBoardState();
   </script>
 </body>
+
 </html>

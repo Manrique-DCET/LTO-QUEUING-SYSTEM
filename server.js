@@ -17,6 +17,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// --- CLEAN URL ROUTES (allow access without .html extension) ---
+const pages = ['admin', 'counter', 'reception', 'display', 'login', 'index'];
+pages.forEach(page => {
+  app.get(`/${page}`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', `${page}.html`));
+  });
+});
+
 // Initialize database schema
 initDatabase()
   .then(() => {
@@ -74,9 +82,9 @@ app.post('/api/auth/login', async (req, res) => {
 
 // --- RECEPTION API (Ticket Generation) ---
 app.post('/api/tickets', async (req, res) => {
-  const { service_type } = req.body;
+  const { service_type, concern } = req.body;
   
-  if (!service_type || !['Licensing', 'Registration', 'Miscellaneous'].includes(service_type)) {
+  if (!service_type || !['Licensing', 'Registration', 'Miscellaneous', 'Settlement', 'Query'].includes(service_type)) {
     return res.status(400).json({ error: 'Invalid service type' });
   }
 
@@ -84,7 +92,9 @@ app.post('/api/tickets', async (req, res) => {
   const prefixes = {
     'Licensing': 'L',
     'Registration': 'R',
-    'Miscellaneous': 'M'
+    'Miscellaneous': 'M',
+    'Settlement': 'S',
+    'Query': 'Q'
   };
   const prefix = prefixes[service_type];
 
@@ -113,14 +123,15 @@ app.post('/api/tickets', async (req, res) => {
     const ticketNumber = `${prefix}-${nextNum}`;
 
     const result = await dbRun(
-      `INSERT INTO tickets (ticket_number, service_type, status) VALUES (?, ?, 'waiting')`,
-      [ticketNumber, service_type]
+      `INSERT INTO tickets (ticket_number, service_type, status, concern) VALUES (?, ?, 'waiting', ?)`,
+      [ticketNumber, service_type, concern || null]
     );
 
     const newTicket = {
       id: result.id,
       ticket_number: ticketNumber,
       service_type,
+      concern: concern || null,
       status: 'waiting',
       created_at: new Date().toISOString()
     };
@@ -139,15 +150,18 @@ app.post('/api/tickets', async (req, res) => {
 });
 
 // --- DISPLAY SCREEN API ---
-// Fetch active calls (currently serving tickets across all counters)
+// Fetch the most recently called ticket per service type today (for the display board).
+// Includes both 'serving' and 'completed' tickets so banners don't go blank when a counter moves on.
 app.get('/api/display/active-calls', async (req, res) => {
   try {
     const activeCalls = await dbAll(
-      `SELECT t.*, u.fullname as staff_name 
-       FROM tickets t 
+      `SELECT t.*, u.fullname as staff_name
+       FROM tickets t
        LEFT JOIN users u ON t.called_by = u.id
-       WHERE t.status = 'serving'
-       ORDER BY t.called_at DESC`
+       WHERE t.called_at IS NOT NULL
+         AND date(t.created_at, 'localtime') = date('now', 'localtime')
+       ORDER BY t.called_at DESC
+       LIMIT 20`
     );
     res.json(activeCalls);
   } catch (err) {
@@ -159,10 +173,10 @@ app.get('/api/display/active-calls', async (req, res) => {
 app.get('/api/display/waiting-queue', async (req, res) => {
   try {
     const waitingQueue = await dbAll(
-      `SELECT ticket_number, service_type FROM tickets 
+      `SELECT ticket_number, service_type, concern FROM tickets 
        WHERE status = 'waiting' 
          AND date(created_at, 'localtime') = date('now', 'localtime')
-       ORDER BY id ASC LIMIT 10`
+       ORDER BY id ASC LIMIT 30`
     );
     res.json(waitingQueue);
   } catch (err) {

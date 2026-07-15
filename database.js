@@ -60,12 +60,50 @@ async function initDatabase() {
     )
   `);
 
-  // 2. Tickets Table
+  // 2. Tickets Table Migration/Setup
+  const tableInfo = await dbGet("SELECT sql FROM sqlite_master WHERE type='table' AND name='tickets'");
+  if (tableInfo && !tableInfo.sql.includes('Settlement')) {
+    console.log('Migrating tickets table to support Settlement and Query services...');
+    try {
+      await dbRun('ALTER TABLE tickets RENAME TO tickets_old');
+      await dbRun(`
+        CREATE TABLE tickets (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          ticket_number TEXT NOT NULL,
+          service_type TEXT NOT NULL CHECK(service_type IN ('Licensing', 'Registration', 'Miscellaneous', 'Settlement', 'Query')),
+          status TEXT NOT NULL CHECK(status IN ('waiting', 'serving', 'completed', 'skipped')),
+          counter_number INTEGER,
+          called_by INTEGER,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          called_at DATETIME,
+          completed_at DATETIME,
+          FOREIGN KEY (called_by) REFERENCES users (id)
+        )
+      `);
+      await dbRun(`
+        INSERT INTO tickets (id, ticket_number, service_type, status, counter_number, called_by, created_at, called_at, completed_at)
+        SELECT id, ticket_number, service_type, status, counter_number, called_by, created_at, called_at, completed_at
+        FROM tickets_old
+      `);
+      await dbRun('DROP TABLE tickets_old');
+      console.log('Tickets table migrated successfully.');
+    } catch (migrationErr) {
+      console.error('Migration failed, attempting rollback/cleanup:', migrationErr);
+      try {
+        await dbRun('DROP TABLE IF EXISTS tickets');
+        await dbRun('ALTER TABLE tickets_old RENAME TO tickets');
+      } catch (rollbackErr) {
+        console.error('Rollback failed:', rollbackErr);
+      }
+    }
+  }
+
   await dbRun(`
     CREATE TABLE IF NOT EXISTS tickets (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ticket_number TEXT NOT NULL,
-      service_type TEXT NOT NULL CHECK(service_type IN ('Licensing', 'Registration', 'Miscellaneous')),
+      service_type TEXT NOT NULL CHECK(service_type IN ('Licensing', 'Registration', 'Miscellaneous', 'Settlement', 'Query')),
+      concern TEXT,
       status TEXT NOT NULL CHECK(status IN ('waiting', 'serving', 'completed', 'skipped')),
       counter_number INTEGER,
       called_by INTEGER,
@@ -75,6 +113,16 @@ async function initDatabase() {
       FOREIGN KEY (called_by) REFERENCES users (id)
     )
   `);
+
+  // Check and add concern column if missing for existing databases
+  const ticketsTableInfo = await dbAll("PRAGMA table_info(tickets)");
+  if (ticketsTableInfo && ticketsTableInfo.length > 0) {
+    const hasConcern = ticketsTableInfo.some(col => col.name === 'concern');
+    if (!hasConcern) {
+      console.log('Migrating tickets table to add concern column...');
+      await dbRun('ALTER TABLE tickets ADD COLUMN concern TEXT');
+    }
+  }
 
   // Seed default accounts if users table is empty
   const userCount = await dbGet('SELECT COUNT(*) as count FROM users');

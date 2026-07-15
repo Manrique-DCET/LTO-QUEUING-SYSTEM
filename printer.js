@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 function printTicket(ticket) {
+  const concernLine = ticket.concern ? `Concern: ${ticket.concern}\n\n` : '';
   const content = `
 =========================
     LAND TRANSPORTATION
@@ -9,8 +10,7 @@ function printTicket(ticket) {
 Queue No: ${ticket.ticket_number}
 
 Service: ${ticket.service_type}
-
-Time: ${new Date().toLocaleTimeString()}
+${concernLine}Time: ${new Date().toLocaleTimeString()}
 
 Please wait until your
 number is called.

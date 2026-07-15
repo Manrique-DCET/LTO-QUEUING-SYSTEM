@@ -725,3 +725,126 @@ ADMIN BAR CHART
   transition: height 0.4s ease;
 
 }
+
+/* =====================================================
+   CONCERN SELECTION PANELS
+   ===================================================== */
+.concern-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-small);
+  padding: 24px 16px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--lto-dark);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.concern-card:hover {
+  border-color: var(--lto-secondary);
+  color: var(--lto-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.concern-icon {
+  font-size: 2.25rem;
+  margin-bottom: 12px;
+  color: var(--lto-secondary);
+  transition: all 0.25s ease;
+}
+
+.concern-card:hover .concern-icon {
+  transform: scale(1.1);
+  color: var(--lto-primary);
+}
+
+/* Category-specific Now Serving Banner Colors */
+.now-serving-licensing {
+  background: linear-gradient(135deg, var(--lto-primary), var(--lto-secondary)) !important;
+  box-shadow: 0 12px 30px rgba(0, 86, 179, 0.3) !important;
+}
+
+.now-serving-registration {
+  background: linear-gradient(135deg, #115e3b, #198754) !important;
+  box-shadow: 0 12px 30px rgba(25, 135, 84, 0.3) !important;
+}
+
+.now-serving-letas {
+  background: linear-gradient(135deg, #b45309, #d97706) !important;
+  box-shadow: 0 12px 30px rgba(217, 119, 6, 0.3) !important;
+}
+
+/* Category-specific Now Serving Pulse Animations */
+.pulse-border-green {
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    box-shadow: 0 0 0 rgba(25, 135, 84, .2);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(25, 135, 84, .45);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(25, 135, 84, .2);
+  }
+}
+
+.pulse-border-yellow {
+  animation: pulseYellow 2s infinite;
+}
+
+@keyframes pulseYellow {
+  0% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, .2);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(245, 158, 11, .45);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, .2);
+  }
+}
+
+/* =====================================================
+   Admin Panel — Role Badges
+===================================================== */
+
+.badge-admin {
+  background-color: #003366;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.badge-staff {
+  background-color: #0d6efd;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.badge-reception {
+  background-color: #198754;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}

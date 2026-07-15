@@ -56,15 +56,15 @@
 
       <div class="d-flex align-items-center gap-3">
 
-        <div class="d-none d-sm-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1.5 rounded-pill border border-white border-opacity-10">
+        <div class="d-none d-sm-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm">
 
-          <div class="user-avatar" id="avatarLetter" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; color: var(--lto-primary);">R</div>
+          <div id="avatarLetter" style="width: 36px; height: 36px; border-radius: 50%; background: #ffd54f; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #003366; flex-shrink: 0;">R</div>
 
-          <div class="d-flex flex-column text-start text-white">
+          <div class="d-flex flex-column text-start" style="color: #003366;">
 
-            <span class="small fw-bold" id="profileName" style="font-size: 0.8rem; line-height: 1.2;">Receptionist</span>
+            <span class="fw-bold" id="profileName" style="font-size: 0.85rem; line-height: 1.2;">Receptionist</span>
 
-            <span class="text-white-50" style="font-size: 0.6rem; text-transform: uppercase; line-height: 1.2;">Kiosk Mode</span>
+            <span style="font-size: 0.6rem; text-transform: uppercase; line-height: 1.2; letter-spacing: 0.5px; opacity: 0.75;">Kiosk Mode</span>
 
           </div>
 
@@ -114,7 +114,7 @@
 
         <div class="col-lg-4">
 
-          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Licensing')">
+          <div class="card lto-card service-card h-100 text-center p-5" onclick="selectConcern('Licensing')">
 
             <div class="mb-4">
 
@@ -156,7 +156,7 @@
 
         <div class="col-lg-4">
 
-          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Registration')">
+          <div class="card lto-card service-card h-100 text-center p-5" onclick="selectConcern('Registration')">
 
             <div class="mb-4">
 
@@ -166,7 +166,7 @@
 
             <h3 class="fw-bold">
 
-              Vehicle Registration
+              Registration & Misc
 
             </h3>
 
@@ -182,6 +182,10 @@
 
               <li>Plate Release</li>
 
+              <li>Certifications & Records</li>
+
+              <li>Verification & Other Requests</li>
+
             </ul>
 
             <button class="btn btn-success mt-3">
@@ -194,43 +198,53 @@
 
         </div>
 
-        <!-- Misc -->
+        <!-- LETAS -->
 
         <div class="col-lg-4">
 
-          <div class="card lto-card service-card h-100 text-center p-5" onclick="generateTicket('Miscellaneous')">
+          <div class="card lto-card service-card h-100 text-center p-5" style="cursor: default;">
 
             <div class="mb-4">
 
-              <i class="bi bi-folder2-open text-warning" style="font-size:70px"></i>
+              <i class="bi bi-shield-fill-exclamation text-warning" style="font-size:70px"></i>
 
             </div>
 
             <h3 class="fw-bold">
 
-              Miscellaneous
+              LETAS
 
             </h3>
 
             <hr>
 
-            <ul class="list-unstyled text-secondary">
+            <ul class="list-unstyled text-secondary mb-4">
 
-              <li>Certifications</li>
+              <li>Law Enforcement</li>
 
-              <li>Records</li>
+              <li>Traffic Adjudication</li>
 
-              <li>Verification</li>
+              <li>Adjudication Services</li>
 
-              <li>Other Requests</li>
+              <li>Settlement & Query</li>
 
             </ul>
 
-            <button class="btn btn-warning text-white mt-3">
+            <div class="d-grid gap-2">
 
-              GET QUEUE NUMBER
+              <button class="btn btn-warning text-white fw-bold py-2.5" onclick="generateTicket('Settlement')">
 
-            </button>
+                SETTLEMENT
+
+              </button>
+
+              <button class="btn btn-outline-warning fw-bold py-2.5" onclick="generateTicket('Query')">
+
+                QUERY
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -260,7 +274,7 @@
 
               <div class="row text-center">
 
-                <div class="col-md-4">
+                <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
 
                   <h2 id="licensingCount" class="fw-bold text-primary">
 
@@ -268,7 +282,7 @@
 
                   </h2>
 
-                  <p>
+                  <p class="mb-0">
 
                     Licensing
 
@@ -276,7 +290,7 @@
 
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3 col-sm-6 mb-3 mb-md-0">
 
                   <h2 id="registrationCount" class="fw-bold text-success">
 
@@ -284,7 +298,7 @@
 
                   </h2>
 
-                  <p>
+                  <p class="mb-0">
 
                     Registration
 
@@ -292,17 +306,33 @@
 
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-3 col-sm-6 mb-3 mb-sm-0">
 
-                  <h2 id="miscCount" class="fw-bold text-warning">
+                  <h2 id="settlementCount" class="fw-bold text-warning">
 
                     --
 
                   </h2>
 
-                  <p>
+                  <p class="mb-0">
 
-                    Miscellaneous
+                    LETAS Settlement
+
+                  </p>
+
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+
+                  <h2 id="queryCount" class="fw-bold text-info">
+
+                    --
+
+                  </h2>
+
+                  <p class="mb-0">
+
+                    LETAS Query
 
                   </p>
 
@@ -345,6 +375,65 @@
     </div>
 
   </footer>
+
+  <!-- ==========================================================
+     CONCERN SELECTION MODAL
+=========================================================== -->
+
+  <div class="modal fade" id="concernModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+
+      <div class="modal-content border-0 shadow-lg">
+
+        <div class="modal-header text-white" style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
+
+          <h5 class="modal-title">
+
+            <i class="bi bi-list-task me-2"></i>
+
+            Select Your Concern
+
+          </h5>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+          </button>
+
+        </div>
+
+        <div class="modal-body bg-light p-4">
+
+          <div class="text-center mb-4">
+
+            <h4 class="fw-bold text-dark mb-1" id="concernServiceTitle">Licensing</h4>
+
+            <p class="text-secondary small mb-0">Please select your specific transaction below.</p>
+
+          </div>
+
+          <div class="row g-3" id="concernOptionsContainer">
+
+            <!-- Options populated dynamically -->
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+
+            Back
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 
   <!-- ==========================================================
      LTO THERMAL TICKET MODAL
@@ -435,6 +524,22 @@
                 <td class="text-end" id="ticketServiceDisplay">
 
                   Licensing
+
+                </td>
+
+              </tr>
+
+              <tr id="ticketConcernRow" style="display: none;">
+
+                <td>
+
+                  <strong>Concern</strong>
+
+                </td>
+
+                <td class="text-end" id="ticketConcernDisplay">
+
+                  --
 
                 </td>
 
@@ -573,25 +678,73 @@
       window.location.href = 'login.html';
     });
 
-    let autoCloseTimeout = null;
+    const serviceConcerns = {
+      Licensing: [
+        { name: "Driver's License", icon: "bi-person-badge" },
+        { name: "Student Permit", icon: "bi-file-earmark-person" },
+        { name: "Renewal", icon: "bi-arrow-clockwise" },
+        { name: "Duplicate License", icon: "bi-copy" }
+      ],
+      Registration: [
+        { name: "Renewal", icon: "bi-arrow-clockwise" },
+        { name: "Transfer Ownership", icon: "bi-person-plus" },
+        { name: "New Registration", icon: "bi-file-earmark-plus" },
+        { name: "Plate Release", icon: "bi-hash" },
+        { name: "Certifications & Records", icon: "bi-patch-check" },
+        { name: "Verification & Other Requests", icon: "bi-question-circle" }
+      ]
+    };
+
     let countdownInterval = null;
-    let bootstrapModal = null;
-
-    document.addEventListener("DOMContentLoaded", () => {
-      bootstrapModal = new bootstrap.Modal(document.getElementById('ticketModal'), {
-        backdrop: 'static',
-        keyboard: false
-      });
+    const bootstrapModal = new bootstrap.Modal(document.getElementById('ticketModal'), {
+      backdrop: 'static',
+      keyboard: false
     });
+    const concernModal = new bootstrap.Modal(document.getElementById('concernModal'), {
+      backdrop: 'static',
+      keyboard: false
+    });
+    let selectedService = '';
 
-    async function generateTicket(serviceType) {
+    function selectConcern(serviceType) {
+      selectedService = serviceType;
+      document.getElementById('concernServiceTitle').textContent = serviceType === 'Registration' ? 'Registration & Misc' : serviceType;
+      
+      const container = document.getElementById('concernOptionsContainer');
+      container.innerHTML = '';
+      
+      const concerns = serviceConcerns[serviceType] || [];
+      concerns.forEach(concern => {
+        const col = document.createElement('div');
+        col.className = 'col-sm-6';
+        const card = document.createElement('div');
+        card.className = 'concern-card';
+        card.dataset.concern = concern.name;
+        card.innerHTML = `
+          <i class="bi ${concern.icon} concern-icon"></i>
+          <div>${concern.name}</div>
+        `;
+        card.addEventListener('click', () => submitTicketWithConcern(concern.name));
+        col.appendChild(card);
+        container.appendChild(col);
+      });
+      
+      concernModal.show();
+    }
+
+    async function submitTicketWithConcern(concern) {
+      concernModal.hide();
+      await generateTicket(selectedService, concern);
+    }
+
+    async function generateTicket(serviceType, concern = null) {
       try {
         const response = await fetch('/api/tickets', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ service_type: serviceType })
+          body: JSON.stringify({ service_type: serviceType, concern: concern })
         });
 
         if (!response.ok) {
@@ -609,6 +762,16 @@
     function showTicket(ticket) {
       document.getElementById("ticketNumberDisplay").textContent = ticket.ticket_number;
       document.getElementById("ticketServiceDisplay").textContent = ticket.service_type;
+
+      const concernRow = document.getElementById("ticketConcernRow");
+      const concernDisplay = document.getElementById("ticketConcernDisplay");
+      if (ticket.concern) {
+        concernRow.style.display = "table-row";
+        concernDisplay.textContent = ticket.concern;
+      } else {
+        concernRow.style.display = "none";
+        concernDisplay.textContent = "";
+      }
 
       const created = new Date(ticket.created_at);
       document.getElementById("ticketDateDisplay").textContent = created.toLocaleDateString();
@@ -683,14 +846,14 @@
       }
     }
 
-    // Bug 5 Fix: Populate live queue counts for Licensing, Registration, Miscellaneous
+    // Populate live queue counts for Licensing, Registration, Settlement, Query
     async function loadQueueCounts() {
       try {
         const response = await fetch('/api/display/waiting-queue');
         if (!response.ok) return;
         const queue = await response.json();
 
-        const counts = { Licensing: 0, Registration: 0, Miscellaneous: 0 };
+        const counts = { Licensing: 0, Registration: 0, Settlement: 0, Query: 0, Miscellaneous: 0 };
         queue.forEach(ticket => {
           if (counts[ticket.service_type] !== undefined) {
             counts[ticket.service_type]++;
@@ -698,8 +861,9 @@
         });
 
         document.getElementById('licensingCount').textContent = counts.Licensing;
-        document.getElementById('registrationCount').textContent = counts.Registration;
-        document.getElementById('miscCount').textContent = counts.Miscellaneous;
+        document.getElementById('registrationCount').textContent = counts.Registration + counts.Miscellaneous;
+        document.getElementById('settlementCount').textContent = counts.Settlement;
+        document.getElementById('queryCount').textContent = counts.Query;
       } catch (err) {
         console.error('Failed to load queue counts:', err);
       }

@@ -35,11 +35,11 @@
             <a href="counter.html" class="btn btn-sm btn-outline-light px-3 py-2" target="_blank">Staff Console ⚙️</a>
           </div>
           
-          <div class="d-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1.5 rounded-pill border border-white border-opacity-10">
-            <div class="user-avatar" id="avatarLetter" style="width: 24px; height: 24px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; color: var(--lto-primary);">A</div>
-            <div class="d-flex flex-column text-start">
-              <span class="text-white small fw-bold" id="profileName" style="font-size: 0.8rem;">Administrator</span>
-              <span class="text-white-50" style="font-size: 0.6rem; text-transform: uppercase;">Admin Mode</span>
+          <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm">
+            <div id="avatarLetter" style="width: 36px; height: 36px; border-radius: 50%; background: #ffd54f; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 700; color: #003366; flex-shrink: 0;">A</div>
+            <div class="d-flex flex-column text-start" style="color: #003366;">
+              <span class="fw-bold" id="profileName" style="font-size: 0.85rem;">Administrator</span>
+              <span style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.75;">Admin Mode</span>
             </div>
           </div>
           <button class="btn btn-sm btn-outline-light px-3 py-2" id="logoutBtn">Logout 🚪</button>
@@ -235,12 +235,12 @@
             <td class="fw-semibold">${u.fullname}</td>
             <td class="text-secondary font-monospace" style="font-size: 0.85rem;">${u.username}</td>
             <td>
-              <span class="badge badge-${u.role} px-2.5 py-1.5 rounded text-uppercase" style="font-size: 0.65rem;">${u.role}</span>
+              <span class="badge badge-${u.role} text-uppercase">${u.role}</span>
             </td>
             <td class="text-end">
               ${u.username === 'admin' 
                 ? `<span class="small text-muted font-monospace">System Root</span>` 
-                : `<button class="btn btn-sm btn-outline-danger px-2.5 py-1" onclick="deleteUser(${u.id})">Delete</button>`
+                : `<button class="btn btn-sm btn-outline-danger px-3 py-1" onclick="deleteUser(${u.id})">Delete</button>`
               }
             </td>
           </tr>
@@ -310,7 +310,7 @@
     }
 
     function renderServicesBreakdown(counts) {
-      const services = ['Licensing', 'Registration', 'Miscellaneous'];
+      const services = ['Licensing', 'Registration', 'Settlement', 'Query', 'Miscellaneous'];
       const breakdownContainer = document.getElementById('servicesBreakdown');
 
       const serviceTotals = {};
@@ -335,6 +335,8 @@
         
         let barClass = 'bg-primary';
         if (s === 'Registration') barClass = 'bg-danger';
+        if (s === 'Settlement') barClass = 'bg-warning';
+        if (s === 'Query') barClass = 'bg-info';
         if (s === 'Miscellaneous') barClass = 'bg-success';
 
         return `
