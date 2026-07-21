@@ -88,6 +88,23 @@
       <!-- Left Column: User manager & Charts (8 Cols) -->
       <div class="col-12 col-lg-8 d-flex flex-column gap-4">
         
+        <!-- System Operational Status Card -->
+        <div class="card lto-card p-4 border-2" id="systemStatusCard" style="transition: all 0.3s ease;">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="fs-5" id="statusIcon">🟢</span>
+                <h3 class="h5 fw-bold text-dark mb-0" id="statusTitle">System Status: ONLINE</h3>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold" id="statusBadge">OPERATIONAL</span>
+              </div>
+              <p class="text-secondary small mb-0" id="statusDesc">Normal operations. Reception kiosks and display boards are active and issuing numbers.</p>
+            </div>
+            <div class="form-check form-switch ps-0 m-0 d-flex align-items-center">
+              <input class="form-check-input ms-0" type="checkbox" role="switch" id="systemOfflineToggle" style="width: 3.8rem; height: 2rem; cursor: pointer;">
+            </div>
+          </div>
+        </div>
+
         <!-- User Management Card -->
         <div class="card lto-card p-4">
           <div class="d-flex justify-content-between align-items-center border-bottom border-light pb-3 mb-3">
@@ -411,12 +428,79 @@
       }
     }
 
+    async function loadSystemStatus() {
+      try {
+        const response = await fetch('/api/system/status');
+        const data = await response.json();
+        updateSystemStatusUI(data.offline);
+      } catch (err) {
+        console.error('Failed to load system status:', err);
+      }
+    }
+
+    function updateSystemStatusUI(isOffline) {
+      const toggle = document.getElementById('systemOfflineToggle');
+      const icon = document.getElementById('statusIcon');
+      const title = document.getElementById('statusTitle');
+      const badge = document.getElementById('statusBadge');
+      const desc = document.getElementById('statusDesc');
+      const card = document.getElementById('systemStatusCard');
+
+      if (toggle) toggle.checked = isOffline;
+
+      if (isOffline) {
+        if (icon) icon.textContent = '🔴';
+        if (title) title.textContent = 'System Status: OFFLINE';
+        if (badge) {
+          badge.className = 'badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold';
+          badge.textContent = 'MAINTENANCE MODE';
+        }
+        if (desc) desc.textContent = 'System is suspended. Reception kiosks are blocked from taking queuing numbers, and display screens show offline notices.';
+        if (card) {
+          card.style.borderColor = '#dc3545';
+          card.style.backgroundColor = 'rgba(220, 53, 69, 0.04)';
+        }
+      } else {
+        if (icon) icon.textContent = '🟢';
+        if (title) title.textContent = 'System Status: ONLINE';
+        if (badge) {
+          badge.className = 'badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold';
+          badge.textContent = 'OPERATIONAL';
+        }
+        if (desc) desc.textContent = 'Normal operations. Reception kiosks and display boards are active and issuing queuing numbers.';
+        if (card) {
+          card.style.borderColor = 'rgba(0,0,0,0.08)';
+          card.style.backgroundColor = '#ffffff';
+        }
+      }
+    }
+
+    document.getElementById('systemOfflineToggle').addEventListener('change', async (e) => {
+      const isOffline = e.target.checked;
+      try {
+        const response = await fetch('/api/admin/toggle-system-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ offline: isOffline })
+        });
+        const data = await response.json();
+        updateSystemStatusUI(data.offline);
+      } catch (err) {
+        console.error('Failed to toggle system status:', err);
+        e.target.checked = !isOffline;
+      }
+    });
+
     socket.on('ticket-created', loadStats);
     socket.on('queue-updated', loadStats);
     socket.on('queue-reset', loadStats);
+    socket.on('system-status-changed', (data) => {
+      updateSystemStatusUI(data.offline);
+    });
 
     loadUsers();
     loadStats();
+    loadSystemStatus();
   </script>
 </body>
 </html>

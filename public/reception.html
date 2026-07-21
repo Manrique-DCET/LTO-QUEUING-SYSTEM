@@ -85,7 +85,18 @@
 
     </div>
 
-  </nav>
+  <!-- Offline Maintenance Overlay for Reception Kiosk -->
+  <div id="kioskOfflineOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
+    style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); z-index: 9999;">
+    <div class="text-center p-5 rounded-4 shadow-lg border border-danger border-opacity-25 bg-white mx-3" style="max-width: 600px;">
+      <div class="display-1 text-danger mb-3">🚫</div>
+      <h2 class="fw-extrabold text-danger mb-2">QUEUING IS SUSPENDED</h2>
+      <p class="lead text-secondary mb-4">The queuing system is currently offline for maintenance. Taking queuing numbers is temporarily disabled.</p>
+      <div class="badge bg-danger-subtle text-danger border border-danger-subtle px-4 py-2 rounded-pill fs-6 fw-bold">
+        Please Check Back Shortly or Approach Reception
+      </div>
+    </div>
+  </div>
 
   <!-- ================= HERO ================= -->
 
@@ -729,7 +740,39 @@
       await generateTicket(selectedService, concern);
     }
 
+    let isSystemOffline = false;
+
+    async function checkKioskSystemStatus() {
+      try {
+        const response = await fetch('/api/system/status');
+        const data = await response.json();
+        updateKioskOfflineUI(data.offline);
+      } catch (err) {
+        console.error('Failed to check kiosk system status:', err);
+      }
+    }
+
+    function updateKioskOfflineUI(offline) {
+      isSystemOffline = offline;
+      const overlay = document.getElementById('kioskOfflineOverlay');
+      if (overlay) {
+        if (offline) {
+          overlay.classList.remove('d-none');
+          overlay.classList.add('d-flex');
+          closeModal();
+        } else {
+          overlay.classList.remove('d-flex');
+          overlay.classList.add('d-none');
+        }
+      }
+    }
+
     async function generateTicket(serviceType, concern = null) {
+      if (isSystemOffline) {
+        alert('System is currently offline / undergoing maintenance. Queuing is suspended.');
+        return;
+      }
+
       try {
         const response = await fetch('/api/tickets', {
           method: 'POST',
@@ -849,13 +892,15 @@
     }
 
     // Load counts on page start, then refresh on real-time queue events
-    loadQueueCounts();
-
     // Real-time updates via Socket.IO
     const socket = io();
     socket.on('queue-updated', loadQueueCounts);
     socket.on('ticket-created', loadQueueCounts);
     socket.on('queue-reset', loadQueueCounts);
+    socket.on('system-status-changed', (data) => updateKioskOfflineUI(data.offline));
+
+    loadQueueCounts();
+    checkKioskSystemStatus();
   </script>
 </body>
 

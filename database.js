@@ -187,7 +187,37 @@ async function initDatabase() {
         'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
         ['cashier2', cashier2Hash, 'staff', 'Main Cashier (Window 8)']
       );
-    }
+  // 3. Settings Table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
+  // Ensure default system_offline setting exists
+  const offlineSetting = await dbGet("SELECT value FROM settings WHERE key = 'system_offline'");
+  if (!offlineSetting) {
+    await dbRun("INSERT INTO settings (key, value) VALUES ('system_offline', '0')");
+  }
+}
+
+async function getSetting(key, defaultValue = '0') {
+  try {
+    const row = await dbGet('SELECT value FROM settings WHERE key = ?', [key]);
+    return row ? row.value : defaultValue;
+  } catch (err) {
+    console.error(`Error getting setting ${key}:`, err);
+    return defaultValue;
+  }
+}
+
+async function setSetting(key, value) {
+  try {
+    await dbRun('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [key, String(value)]);
+  } catch (err) {
+    console.error(`Error setting ${key} to ${value}:`, err);
+    throw err;
   }
 }
 
@@ -195,5 +225,7 @@ module.exports = {
   initDatabase,
   dbRun,
   dbGet,
-  dbAll
+  dbAll,
+  getSetting,
+  setSetting
 };

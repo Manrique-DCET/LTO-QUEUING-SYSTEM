@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const { initDatabase, dbRun, dbGet, dbAll } = require('./database');
+const { initDatabase, dbRun, dbGet, dbAll, getSetting, setSetting } = require('./database');
 const { printTicket } = require('./printer');
 
 const app = express();
@@ -16,6 +16,31 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- SYSTEM STATUS & MAINTENANCE ENDPOINTS ---
+app.get('/api/system/status', async (req, res) => {
+  try {
+    const offlineVal = await getSetting('system_offline', '0');
+    res.json({ offline: offlineVal === '1' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to retrieve system status' });
+  }
+});
+
+app.post('/api/admin/toggle-system-status', async (req, res) => {
+  try {
+    const { offline } = req.body;
+    const isOffline = offline === true || offline === '1' || offline === 1;
+    await setSetting('system_offline', isOffline ? '1' : '0');
+    
+    // Broadcast status change to all connected clients (Display TV, Reception, Counter Staff)
+    io.emit('system-status-changed', { offline: isOffline });
+    
+    res.json({ success: true, offline: isOffline });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update system status' });
+  }
+});
 
 // --- CLEAN URL ROUTES (allow access without .html extension) ---
 const pages = ['admin', 'counter', 'reception', 'display', 'login', 'index'];
@@ -82,6 +107,12 @@ app.post('/api/auth/login', async (req, res) => {
 
 // --- RECEPTION API (Ticket Generation) ---
 app.post('/api/tickets', async (req, res) => {
+  // Check if system is currently marked as offline
+  const isOffline = (await getSetting('system_offline', '0')) === '1';
+  if (isOffline) {
+    return res.status(503).json({ error: 'System is currently offline / undergoing maintenance. Queuing is suspended.' });
+  }
+
   const { service_type, concern } = req.body;
   
   if (!service_type || !['Licensing', 'Registration', 'Miscellaneous', 'Settlement', 'Query'].includes(service_type)) {

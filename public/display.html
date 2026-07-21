@@ -45,8 +45,25 @@
           Loading...
         </div>
       </div>
+  <!-- Offline Overlay for Display TV -->
+  <div id="displayOfflineOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
+    style="background: rgba(10, 15, 30, 0.96); backdrop-filter: blur(15px); z-index: 9999;">
+    <div class="text-center text-white px-4" style="max-width: 750px;">
+      <div class="mb-4">
+        <span class="display-1 text-warning">⚠️</span>
+      </div>
+      <h1 class="display-3 fw-extrabold mb-3 text-warning" style="letter-spacing: 2px; text-transform: uppercase;">
+        SYSTEM OFFLINE
+      </h1>
+      <p class="fs-4 text-light opacity-75 mb-4 fw-medium" style="line-height: 1.6;">
+        Queuing operations are temporarily suspended. No queuing numbers are currently being issued.
+      </p>
+      <div class="d-inline-flex align-items-center gap-3 bg-white bg-opacity-10 border border-warning border-opacity-25 px-5 py-3 rounded-pill">
+        <span class="spinner-grow spinner-grow-sm text-warning" role="status"></span>
+        <span class="fs-5 text-warning fw-semibold">Please Standby for System Restoration</span>
+      </div>
     </div>
-  </nav>
+  </div>
 
   <!-- Main Content (Digital Signage widescreen layout) -->
   <main class="container-fluid my-auto px-4 px-xl-5 py-3 flex-grow-1 overflow-auto d-flex flex-column gap-4"
@@ -440,15 +457,42 @@
       loadBoardState();
     });
 
+    async function checkSystemStatus() {
+      try {
+        const response = await fetch('/api/system/status');
+        const data = await response.json();
+        toggleDisplayOffline(data.offline);
+      } catch (err) {
+        console.error('Failed to check system status:', err);
+      }
+    }
+
+    function toggleDisplayOffline(isOffline) {
+      const overlay = document.getElementById('displayOfflineOverlay');
+      if (overlay) {
+        if (isOffline) {
+          overlay.classList.remove('d-none');
+          overlay.classList.add('d-flex');
+        } else {
+          overlay.classList.remove('d-flex');
+          overlay.classList.add('d-none');
+        }
+      }
+    }
+
     socket.on('ticket-created', loadBoardState);
     socket.on('queue-updated', loadBoardState);
     socket.on('queue-reset', loadBoardState);
+    socket.on('system-status-changed', (data) => {
+      toggleDisplayOffline(data.offline);
+    });
 
     window.speechSynthesis.onvoiceschanged = () => {
       window.speechSynthesis.getVoices();
     };
 
     loadBoardState();
+    checkSystemStatus();
   </script>
 </body>
 
