@@ -130,6 +130,20 @@ async function initDatabase() {
     }
   }
 
+  // 3. Settings Table
+  await dbRun(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    )
+  `);
+
+  // Ensure default system_offline setting exists
+  const offlineSetting = await dbGet("SELECT value FROM settings WHERE key = 'system_offline'");
+  if (!offlineSetting) {
+    await dbRun("INSERT INTO settings (key, value) VALUES ('system_offline', '0')");
+  }
+
   // Seed default accounts if users table is empty
   const userCount = await dbGet('SELECT COUNT(*) as count FROM users');
   if (userCount.count === 0) {
@@ -187,18 +201,7 @@ async function initDatabase() {
         'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
         ['cashier2', cashier2Hash, 'staff', 'Main Cashier (Window 8)']
       );
-  // 3. Settings Table
-  await dbRun(`
-    CREATE TABLE IF NOT EXISTS settings (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL
-    )
-  `);
-
-  // Ensure default system_offline setting exists
-  const offlineSetting = await dbGet("SELECT value FROM settings WHERE key = 'system_offline'");
-  if (!offlineSetting) {
-    await dbRun("INSERT INTO settings (key, value) VALUES ('system_offline', '0')");
+    }
   }
 }
 
