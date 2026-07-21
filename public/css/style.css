@@ -782,6 +782,16 @@ ADMIN BAR CHART
   box-shadow: 0 12px 30px rgba(217, 119, 6, 0.3) !important;
 }
 
+.now-serving-cashier3 {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  box-shadow: 0 12px 30px rgba(3, 105, 161, 0.3) !important;
+}
+
+.now-serving-cashier8 {
+  background: linear-gradient(135deg, #be123c, #9f1239) !important;
+  box-shadow: 0 12px 30px rgba(159, 18, 57, 0.3) !important;
+}
+
 /* Category-specific Now Serving Pulse Animations */
 .pulse-border-green {
   animation: pulseGreen 2s infinite;
@@ -797,6 +807,26 @@ ADMIN BAR CHART
   100% {
     box-shadow: 0 0 0 rgba(25, 135, 84, .2);
   }
+}
+
+.pulse-border-info {
+  animation: pulseInfo 2s infinite;
+}
+
+@keyframes pulseInfo {
+  0% { box-shadow: 0 0 0 rgba(2, 132, 199, .2); }
+  50% { box-shadow: 0 0 35px rgba(2, 132, 199, .45); }
+  100% { box-shadow: 0 0 0 rgba(2, 132, 199, .2); }
+}
+
+.pulse-border-red {
+  animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 rgba(190, 18, 60, .2); }
+  50% { box-shadow: 0 0 35px rgba(190, 18, 60, .45); }
+  100% { box-shadow: 0 0 0 rgba(190, 18, 60, .2); }
 }
 
 .pulse-border-yellow {

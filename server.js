@@ -90,11 +90,11 @@ app.post('/api/tickets', async (req, res) => {
 
   // Map service type to prefix
   const prefixes = {
-    'Licensing': 'L',
-    'Registration': 'R',
+    'Licensing': 'DLS',
+    'Registration': 'MV',
     'Miscellaneous': 'M',
-    'Settlement': 'S',
-    'Query': 'Q'
+    'Settlement': 'LETAS',
+    'Query': 'LETAS'
   };
   const prefix = prefixes[service_type];
 
@@ -173,7 +173,7 @@ app.get('/api/display/active-calls', async (req, res) => {
 app.get('/api/display/waiting-queue', async (req, res) => {
   try {
     const waitingQueue = await dbAll(
-      `SELECT ticket_number, service_type, concern FROM tickets 
+      `SELECT ticket_number, service_type, concern, assigned_window FROM tickets 
        WHERE status = 'waiting' 
          AND date(created_at, 'localtime') = date('now', 'localtime')
        ORDER BY id ASC LIMIT 30`
@@ -203,17 +203,29 @@ app.post('/api/counter/call-next', async (req, res) => {
     );
 
     // 2. Find the next waiting ticket matching the handled services
-    // Use place-holders dynamically based on service count
-    const placeholders = services.map(() => '?').join(',');
-    const query = `
-      SELECT * FROM tickets 
-      WHERE status = 'waiting' 
-        AND service_type IN (${placeholders})
-        AND date(created_at, 'localtime') = date('now', 'localtime')
-      ORDER BY id ASC LIMIT 1
-    `;
+    // Check if there is an assigned ticket for this specific counter window first
+    let nextTicket = await dbGet(
+      `SELECT * FROM tickets 
+       WHERE status = 'waiting' 
+         AND assigned_window = ? 
+         AND date(created_at, 'localtime') = date('now', 'localtime')
+       ORDER BY id ASC LIMIT 1`,
+      [counter_number]
+    );
 
-    const nextTicket = await dbGet(query, services);
+    // If no specific assigned ticket, query unassigned waiting tickets matching services
+    if (!nextTicket) {
+      const placeholders = services.map(() => '?').join(',');
+      const query = `
+        SELECT * FROM tickets 
+        WHERE status = 'waiting' 
+          AND (assigned_window IS NULL OR assigned_window = 0)
+          AND service_type IN (${placeholders})
+          AND date(created_at, 'localtime') = date('now', 'localtime')
+        ORDER BY id ASC LIMIT 1
+      `;
+      nextTicket = await dbGet(query, services);
+    }
 
     if (!nextTicket) {
       broadcastQueueUpdate();
@@ -248,6 +260,38 @@ app.post('/api/counter/call-next', async (req, res) => {
     res.json({ ticket: updatedTicket });
   } catch (err) {
     res.status(500).json({ error: 'Failed to call next ticket' });
+  }
+});
+
+// Transfer Ticket to Cashier Window (Window 3 or Window 8)
+app.post('/api/counter/transfer', async (req, res) => {
+  const { ticket_id, target_window } = req.body;
+
+  if (!ticket_id || !target_window) {
+    return res.status(400).json({ error: 'Ticket ID and target window are required' });
+  }
+
+  const windowNum = parseInt(target_window, 10);
+  if (isNaN(windowNum) || (windowNum !== 3 && windowNum !== 8)) {
+    return res.status(400).json({ error: 'Invalid target cashier window (must be 3 or 8)' });
+  }
+
+  try {
+    const result = await dbRun(
+      `UPDATE tickets 
+       SET status = 'waiting', assigned_window = ?, called_by = NULL, called_at = NULL 
+       WHERE id = ? AND status = 'serving'`,
+      [windowNum, ticket_id]
+    );
+
+    if (result.changes === 0) {
+      return res.status(400).json({ error: 'Ticket is no longer active or cannot be transferred' });
+    }
+
+    broadcastQueueUpdate();
+    res.json({ success: true, message: `Ticket transferred to Window ${windowNum}` });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to transfer ticket' });
   }
 });
 

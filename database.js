@@ -104,6 +104,7 @@ async function initDatabase() {
       ticket_number TEXT NOT NULL,
       service_type TEXT NOT NULL CHECK(service_type IN ('Licensing', 'Registration', 'Miscellaneous', 'Settlement', 'Query')),
       concern TEXT,
+      assigned_window INTEGER,
       status TEXT NOT NULL CHECK(status IN ('waiting', 'serving', 'completed', 'skipped')),
       counter_number INTEGER,
       called_by INTEGER,
@@ -114,13 +115,18 @@ async function initDatabase() {
     )
   `);
 
-  // Check and add concern column if missing for existing databases
+  // Check and add concern and assigned_window columns if missing for existing databases
   const ticketsTableInfo = await dbAll("PRAGMA table_info(tickets)");
   if (ticketsTableInfo && ticketsTableInfo.length > 0) {
     const hasConcern = ticketsTableInfo.some(col => col.name === 'concern');
     if (!hasConcern) {
       console.log('Migrating tickets table to add concern column...');
       await dbRun('ALTER TABLE tickets ADD COLUMN concern TEXT');
+    }
+    const hasAssignedWindow = ticketsTableInfo.some(col => col.name === 'assigned_window');
+    if (!hasAssignedWindow) {
+      console.log('Migrating tickets table to add assigned_window column...');
+      await dbRun('ALTER TABLE tickets ADD COLUMN assigned_window INTEGER');
     }
   }
 
@@ -133,6 +139,8 @@ async function initDatabase() {
     const adminHash = await bcrypt.hash('admin123', saltRounds);
     const staff1Hash = await bcrypt.hash('staff123', saltRounds);
     const staff2Hash = await bcrypt.hash('staff123', saltRounds);
+    const cashier1Hash = await bcrypt.hash('cashier123', saltRounds);
+    const cashier2Hash = await bcrypt.hash('cashier123', saltRounds);
     const receptionHash = await bcrypt.hash('reception123', saltRounds);
 
     await dbRun(
@@ -149,9 +157,37 @@ async function initDatabase() {
     );
     await dbRun(
       'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
+      ['cashier1', cashier1Hash, 'staff', 'Licensing Cashier (Window 3)']
+    );
+    await dbRun(
+      'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
+      ['cashier2', cashier2Hash, 'staff', 'Main Cashier (Window 8)']
+    );
+    await dbRun(
+      'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
       ['reception', receptionHash, 'reception', 'Reception Kiosk']
     );
     console.log('Default accounts seeded successfully.');
+  } else {
+    // Ensure cashier accounts exist in database
+    const cashier1 = await dbGet("SELECT id FROM users WHERE username = 'cashier1'");
+    if (!cashier1) {
+      const saltRounds = 10;
+      const cashier1Hash = await bcrypt.hash('cashier123', saltRounds);
+      await dbRun(
+        'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
+        ['cashier1', cashier1Hash, 'staff', 'Licensing Cashier (Window 3)']
+      );
+    }
+    const cashier2 = await dbGet("SELECT id FROM users WHERE username = 'cashier2'");
+    if (!cashier2) {
+      const saltRounds = 10;
+      const cashier2Hash = await bcrypt.hash('cashier123', saltRounds);
+      await dbRun(
+        'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
+        ['cashier2', cashier2Hash, 'staff', 'Main Cashier (Window 8)']
+      );
+    }
   }
 }
 

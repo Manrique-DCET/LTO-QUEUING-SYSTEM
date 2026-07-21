@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LTO Queuing System - Counter Staff</title>
+  <title>Counter Staff | LTO Queuing System</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -17,8 +17,7 @@
   <nav class="navbar navbar-expand navbar-dark lto-header px-4 py-3">
     <div class="container-fluid">
       <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Land_Transportation_Office_%28LTO%29.svg"
-          alt="LTO Logo" style="width: 45px; height: 45px;">
+        <img src="lto-logo.svg" alt="LTO Logo" style="width: 45px; height: 45px;">
         <div>
           <div class="fw-bold text-white mb-0 h5">LAND TRANSPORTATION OFFICE</div>
           <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office
@@ -58,7 +57,7 @@
           <h3 class="h5 fw-bold text-dark mb-3 border-bottom border-light pb-2"
             style="color: var(--lto-primary) !important;">Desk Settings</h3>
 
-          <!-- Counter Number Select -->
+          <!-- Window Number Select -->
           <div class="mb-3">
             <label for="counterNumSelect" class="form-label small text-secondary fw-semibold">Assign Window
               Number</label>
@@ -68,6 +67,9 @@
               <option value="3">Window 3</option>
               <option value="4">Window 4</option>
               <option value="5">Window 5</option>
+              <option value="6">Window 6</option>
+              <option value="7">Window 7</option>
+              <option value="8">Window 8</option>
             </select>
           </div>
 
@@ -90,6 +92,10 @@
               <div class="form-check form-switch bg-light rounded border border-light p-2 px-5">
                 <input class="form-check-input ms-[-2.5em] float-start" type="checkbox" id="srvQuery" checked>
                 <label class="form-check-label text-dark small" for="srvQuery">Query (LETAS)</label>
+              </div>
+              <div class="form-check form-switch bg-light rounded border border-light p-2 px-5" style="background: rgba(3, 105, 161, 0.06) !important; border-color: rgba(3, 105, 161, 0.2) !important;">
+                <input class="form-check-input ms-[-2.5em] float-start" type="checkbox" id="srvCashier" checked>
+                <label class="form-check-label text-dark small fw-bold" for="srvCashier">💳 Cashier / Payments</label>
               </div>
             </div>
           </div>
@@ -136,7 +142,7 @@
 
             <div
               class="alert alert-warning d-inline-flex align-items-center gap-2 px-4 py-2.5 rounded-pill mb-5 fs-6 fw-bold border border-warning-subtle text-warning-emphasis"
-              style="background: rgba(245, 158, 11, 0.05);">
+              style="background: rgba(245, 158, 11, 0.05); display: none;">
               <span>⏱️</span> Elapsed Time: <span id="servingTimer">00:00</span>
             </div>
 
@@ -159,13 +165,32 @@
                 </button>
               </div>
             </div>
+
+            <!-- Cashier Forwarding Buttons -->
+            <div class="mt-4 pt-3 border-top border-secondary-subtle" style="max-width: 550px; margin: 0 auto;">
+              <div class="small text-secondary fw-bold text-uppercase mb-2" style="letter-spacing: 0.5px;">Proceed to Cashier</div>
+              <div class="row g-2 justify-content-center">
+                <div class="col-12 col-sm-6">
+                  <button class="btn btn-outline-primary w-100 py-2.5 fw-bold d-flex flex-column align-items-center justify-content-center" onclick="transferCurrent(3)">
+                    <span>💳 Proceed to Window 3</span>
+                    <span class="fw-normal text-muted" style="font-size: 0.75rem;">(Licensing Cashier)</span>
+                  </button>
+                </div>
+                <div class="col-12 col-sm-6">
+                  <button class="btn btn-outline-info w-100 py-2.5 fw-bold d-flex flex-column align-items-center justify-content-center" onclick="transferCurrent(8)">
+                    <span>💳 Proceed to Window 8</span>
+                    <span class="fw-normal text-muted" style="font-size: 0.75rem;">(Main Cashier)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- State 2: Idle Mode -->
           <div id="idleState" class="d-flex flex-column align-items-center text-dark">
             <div class="fs-1 mb-3">💤</div>
             <h3 class="h4 fw-bold mb-2">Idle Terminal</h3>
-            <p class="text-secondary small mb-4" style="max-width: 440px;">Select your counter number and handled
+            <p class="text-secondary small mb-4" style="max-width: 440px;">Select your window number and handled
               services in the sidebar, then click call next when ready to serve a customer.</p>
             <button class="btn btn-lg btn-lto-blue px-5 py-3 fw-bold fs-5" onclick="callNextTicket()" id="callNextBtn">
               🚀 Call Next Customer
@@ -209,16 +234,42 @@
     const chkRegistration = document.getElementById('srvRegistration');
     const chkSettlement = document.getElementById('srvSettlement');
     const chkQuery = document.getElementById('srvQuery');
+    const chkCashier = document.getElementById('srvCashier');
 
-    if (localStorage.getItem('staff_counter')) {
+    function updateTabTitle() {
+      const windowNum = counterSelect.value;
+      let label = `Window ${windowNum}`;
+      if (windowNum === '3') label += ' (Licensing Cashier)';
+      else if (windowNum === '8') label += ' (Main Cashier)';
+      document.title = `${label} | Counter Staff`;
+    }
+
+    if (user.username === 'cashier1') {
+      counterSelect.value = '3';
+      chkLicensing.checked = false;
+      chkRegistration.checked = false;
+      chkSettlement.checked = false;
+      chkQuery.checked = false;
+      chkCashier.checked = true;
+    } else if (user.username === 'cashier2') {
+      counterSelect.value = '8';
+      chkLicensing.checked = false;
+      chkRegistration.checked = false;
+      chkSettlement.checked = false;
+      chkQuery.checked = false;
+      chkCashier.checked = true;
+    } else if (localStorage.getItem('staff_counter')) {
       counterSelect.value = localStorage.getItem('staff_counter');
     }
-    if (localStorage.getItem('staff_services')) {
+    updateTabTitle();
+
+    if (localStorage.getItem('staff_services') && !user.username.startsWith('cashier')) {
       const savedServices = JSON.parse(localStorage.getItem('staff_services'));
       chkLicensing.checked = savedServices.includes('Licensing');
       chkRegistration.checked = savedServices.includes('Registration');
       chkSettlement.checked = savedServices.includes('Settlement');
       chkQuery.checked = savedServices.includes('Query');
+      chkCashier.checked = savedServices.includes('Cashier');
     }
 
     function saveConfigs() {
@@ -228,7 +279,9 @@
       if (chkRegistration.checked) services.push('Registration');
       if (chkSettlement.checked) services.push('Settlement');
       if (chkQuery.checked) services.push('Query');
+      if (chkCashier.checked) services.push('Cashier');
       localStorage.setItem('staff_services', JSON.stringify(services));
+      updateTabTitle();
       loadQueueStats();
     }
 
@@ -237,6 +290,7 @@
     chkRegistration.addEventListener('change', saveConfigs);
     chkSettlement.addEventListener('change', saveConfigs);
     chkQuery.addEventListener('change', saveConfigs);
+    chkCashier.addEventListener('change', saveConfigs);
 
     function getSelectedServices() {
       const services = [];
@@ -244,6 +298,7 @@
       if (chkRegistration.checked) services.push('Registration');
       if (chkSettlement.checked) services.push('Settlement');
       if (chkQuery.checked) services.push('Query');
+      if (chkCashier.checked) services.push('Cashier');
       return services;
     }
 
@@ -252,7 +307,17 @@
         const response = await fetch('/api/display/waiting-queue');
         const waitingQueue = await response.json();
         const services = getSelectedServices();
-        const matchingTickets = waitingQueue.filter(t => services.includes(t.service_type));
+        const currentWin = parseInt(counterSelect.value, 10);
+
+        const matchingTickets = waitingQueue.filter(t => {
+          if (t.assigned_window && t.assigned_window === currentWin && services.includes('Cashier')) {
+            return true;
+          }
+          if ((!t.assigned_window || t.assigned_window === 0) && services.includes(t.service_type)) {
+            return true;
+          }
+          return false;
+        });
 
         document.getElementById('waitingTotalCount').textContent = waitingQueue.length;
         document.getElementById('waitingMatchCount').textContent = matchingTickets.length;
@@ -406,6 +471,29 @@
         }
       } catch (err) {
         alert('Action failed: ' + err.message);
+      }
+    }
+
+    async function transferCurrent(targetWindow) {
+      if (!activeTicket) return;
+      try {
+        const response = await fetch('/api/counter/transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticket_id: activeTicket.id,
+            target_window: targetWindow
+          })
+        });
+        if (response.ok) {
+          showIdleState();
+          loadQueueStats();
+        } else {
+          const data = await response.json();
+          throw new Error(data.error || 'Transfer failed');
+        }
+      } catch (err) {
+        alert('Transfer failed: ' + err.message);
       }
     }
 

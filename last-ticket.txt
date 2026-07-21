@@ -3,12 +3,10 @@
     LAND TRANSPORTATION
           OFFICE
 
-Queue No: R-111
+Queue No: LETAS-105
 
-Service: Registration
-Concern: Plate Release
-
-Time: 2:08:21 AM
+Service: Settlement
+Time: 3:07:58 AM
 
 Please wait until your
 number is called.
