@@ -3,10 +3,12 @@
     LAND TRANSPORTATION
           OFFICE
 
-Queue No: LETAS-105
+Queue No: DLS-101
 
-Service: Settlement
-Time: 3:07:58 AM
+Service: Licensing
+Concern: Other Transaction<br>(Duplicate, Conversion of Foreign, Revision of Record)
+
+Time: 12:00:08 AM
 
 Please wait until your
 number is called.

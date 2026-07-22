@@ -173,7 +173,7 @@
                 <div class="col-12 col-sm-6">
                   <button class="btn btn-outline-primary w-100 py-2.5 fw-bold d-flex flex-column align-items-center justify-content-center" onclick="transferCurrent(3)">
                     <span>💳 Proceed to Window 3</span>
-                    <span class="fw-normal text-muted" style="font-size: 0.75rem;">(Licensing Cashier)</span>
+                    <span class="fw-normal text-muted" style="font-size: 0.75rem;">(License Cashier)</span>
                   </button>
                 </div>
                 <div class="col-12 col-sm-6">
@@ -239,7 +239,7 @@
     function updateTabTitle() {
       const windowNum = counterSelect.value;
       let label = `Window ${windowNum}`;
-      if (windowNum === '3') label += ' (Licensing Cashier)';
+      if (windowNum === '3') label += ' (License Cashier)';
       else if (windowNum === '8') label += ' (Main Cashier)';
       document.title = `${label} | Counter Staff`;
     }

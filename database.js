@@ -171,7 +171,7 @@ async function initDatabase() {
     );
     await dbRun(
       'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
-      ['cashier1', cashier1Hash, 'staff', 'Licensing Cashier (Window 3)']
+      ['cashier1', cashier1Hash, 'staff', 'License Cashier (Window 3)']
     );
     await dbRun(
       'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
@@ -190,7 +190,7 @@ async function initDatabase() {
       const cashier1Hash = await bcrypt.hash('cashier123', saltRounds);
       await dbRun(
         'INSERT INTO users (username, password, role, fullname) VALUES (?, ?, ?, ?)',
-        ['cashier1', cashier1Hash, 'staff', 'Licensing Cashier (Window 3)']
+        ['cashier1', cashier1Hash, 'staff', 'License Cashier (Window 3)']
       );
     }
     const cashier2 = await dbGet("SELECT id FROM users WHERE username = 'cashier2'");

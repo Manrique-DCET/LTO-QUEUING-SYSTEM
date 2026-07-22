@@ -7,27 +7,19 @@
   <title>Display Monitor | LTO Queuing System</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="css/style.css">
   <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body class="tv-display-theme d-flex flex-column min-vh-100 overflow-hidden">
 
-  <!-- Audio Enable Banner (Hidden once clicked) -->
-  <div id="audioBanner"
-    class="alert alert-primary text-center m-0 border-0 rounded-0 cursor-pointer text-white d-flex align-items-center justify-content-center gap-2"
-    style="background-color: var(--lto-primary); cursor: pointer; z-index: 1050; position: relative; transition: var(--transition-smooth);">
-    <span class="fs-5">🔊</span> <span class="fw-bold">Click here to enable Audio Announcements</span> for this monitor
-    screen.
-  </div>
-
   <!-- Navbar / Header -->
   <nav class="navbar navbar-expand navbar-dark px-4 py-3"
     style="background: linear-gradient(90deg, var(--lto-primary), var(--lto-secondary));">
     <div class="container-fluid">
       <div class="navbar-brand d-flex align-items-center gap-2">
-        <img src="lto-logo.svg"
-          alt="LTO Logo" style="width: 45px; height: 45px;">
+        <img src="lto-logo.svg" alt="LTO Logo" style="width: 45px; height: 45px;">
         <div>
           <div class="fw-bold text-white mb-0 h5">LAND TRANSPORTATION OFFICE</div>
           <div class="fw-semibold small" style="color: var(--lto-yellow); font-size: 0.8rem;">San Pedro Extension Office
@@ -38,15 +30,27 @@
         </div>
       </div>
 
-      <div class="collapse navbar-collapse justify-content-end">
+      <div class="collapse navbar-collapse justify-content-end gap-3 align-items-center">
+        <select id="voiceSelect" class="form-select form-select-sm border-0 shadow-sm d-none" style="width: auto; max-width: 200px; font-size: 0.8rem; background-color: rgba(255, 255, 255, 0.9); color: #003366; font-weight: 600; border-radius: 20px;">
+          <option value="">Default Voice</option>
+        </select>
+        <button id="audioToggleBtn"
+          class="btn btn-warning btn-sm fw-bold px-3 py-1.5 rounded-pill shadow-sm d-flex align-items-center gap-2"
+          style="font-size: 0.85rem; transition: all 0.25s ease;">
+          <i class="bi bi-volume-mute-fill fs-6" id="audioIcon"></i>
+          <span id="audioText">Enable Audio</span>
+        </button>
         <div
           class="fw-bold text-white-50 px-3 py-1.5 bg-dark bg-opacity-50 border border-secondary border-opacity-10 rounded-3"
           id="liveClock" style="font-size: 0.95rem;">
           Loading...
         </div>
       </div>
+    </div>
+  </nav>
   <!-- Offline Overlay for Display TV -->
-  <div id="displayOfflineOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
+  <div id="displayOfflineOverlay"
+    class="position-fixed top-0 start-0 w-100 h-100 d-none justify-content-center align-items-center"
     style="background: rgba(10, 15, 30, 0.96); backdrop-filter: blur(15px); z-index: 9999;">
     <div class="text-center text-white px-4" style="max-width: 750px;">
       <div class="mb-4">
@@ -58,7 +62,8 @@
       <p class="fs-4 text-light opacity-75 mb-4 fw-medium" style="line-height: 1.6;">
         Queuing operations are temporarily suspended. No queuing numbers are currently being issued.
       </p>
-      <div class="d-inline-flex align-items-center gap-3 bg-white bg-opacity-10 border border-warning border-opacity-25 px-5 py-3 rounded-pill">
+      <div
+        class="d-inline-flex align-items-center gap-3 bg-white bg-opacity-10 border border-warning border-opacity-25 px-5 py-3 rounded-pill">
         <span class="spinner-grow spinner-grow-sm text-warning" role="status"></span>
         <span class="fs-5 text-warning fw-semibold">Please Standby for System Restoration</span>
       </div>
@@ -76,7 +81,8 @@
         <div
           class="card now-serving-banner now-serving-licensing text-center p-3 d-flex flex-column align-items-center justify-content-center h-100"
           id="nowServingLicensingPanel" style="border-radius: 20px;">
-          <div class="small text-white-50 text-uppercase fw-bold mb-1" style="letter-spacing: 1.5px; font-size: 0.8rem;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-1"
+            style="letter-spacing: 1.5px; font-size: 0.8rem;">
             Licensing Now Serving
           </div>
           <div class="huge-queue-text mb-1" id="nowServingLicensingNumber" style="font-size: 3.5rem; line-height: 1;">
@@ -92,7 +98,8 @@
         <div
           class="card now-serving-banner now-serving-registration text-center p-3 d-flex flex-column align-items-center justify-content-center h-100"
           id="nowServingRegistrationPanel" style="border-radius: 20px;">
-          <div class="small text-white-50 text-uppercase fw-bold mb-1" style="letter-spacing: 1.5px; font-size: 0.8rem;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-1"
+            style="letter-spacing: 1.5px; font-size: 0.8rem;">
             Reg. & Misc. Serving
           </div>
           <div class="huge-queue-text mb-1" id="nowServingRegistrationNumber"
@@ -108,7 +115,8 @@
         <div
           class="card now-serving-banner now-serving-letas text-center p-3 d-flex flex-column align-items-center justify-content-center h-100"
           id="nowServingLETASPanel" style="border-radius: 20px;">
-          <div class="small text-white-50 text-uppercase fw-bold mb-1" style="letter-spacing: 1.5px; font-size: 0.8rem;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-1"
+            style="letter-spacing: 1.5px; font-size: 0.8rem;">
             LETAS Now Serving
           </div>
           <div class="huge-queue-text mb-1" id="nowServingLETASNumber" style="font-size: 3.5rem; line-height: 1;">---
@@ -124,8 +132,9 @@
         <div
           class="card now-serving-banner now-serving-cashier3 text-center p-3 d-flex flex-column align-items-center justify-content-center h-100"
           id="nowServingCashier3Panel" style="border-radius: 20px;">
-          <div class="small text-white-50 text-uppercase fw-bold mb-1" style="letter-spacing: 1.5px; font-size: 0.8rem;">
-            Licensing Cashier
+          <div class="small text-white-50 text-uppercase fw-bold mb-1"
+            style="letter-spacing: 1.5px; font-size: 0.8rem;">
+            License Cashier
           </div>
           <div class="huge-queue-text mb-1" id="nowServingCashier3Number" style="font-size: 3.5rem; line-height: 1;">---
           </div>
@@ -140,7 +149,8 @@
         <div
           class="card now-serving-banner now-serving-cashier8 text-center p-3 d-flex flex-column align-items-center justify-content-center h-100"
           id="nowServingCashier8Panel" style="border-radius: 20px;">
-          <div class="small text-white-50 text-uppercase fw-bold mb-1" style="letter-spacing: 1.5px; font-size: 0.8rem;">
+          <div class="small text-white-50 text-uppercase fw-bold mb-1"
+            style="letter-spacing: 1.5px; font-size: 0.8rem;">
             Main Cashier
           </div>
           <div class="huge-queue-text mb-1" id="nowServingCashier8Number" style="font-size: 3.5rem; line-height: 1;">---
@@ -154,19 +164,19 @@
 
     <!-- Bottom Block: Waiting Queue Card -->
     <div class="card lto-card p-4 flex-grow-1 overflow-hidden"
-      style="background-color: #1A1A1A !important; border-color: #2C2C2C !important;">
-      <div class="d-flex align-items-center gap-2 pb-3 border-bottom border-secondary border-opacity-20 mb-3">
+      style="background-color: #e9f9ff !important; border-color: #cce0f5 !important; box-shadow: 0 10px 30px rgba(0, 51, 102, 0.07);">
+      <div class="d-flex align-items-center gap-2 pb-3 border-bottom border-light-subtle mb-3">
         <span class="fs-5">📋</span>
-        <h3 class="h5 fw-bold text-white mb-0">Waiting Queue</h3>
+        <h3 class="h5 fw-bold text-dark mb-0">Waiting Queue</h3>
       </div>
 
       <div class="row g-3 flex-grow-1 overflow-hidden">
         <!-- Licensing Column -->
-        <div class="col-12 col-md border-end border-secondary border-opacity-20 d-flex flex-column"
-          style="min-height: 35vh;">
+        <div class="col-12 col-md border-end border-light-subtle d-flex flex-column" style="min-height: 35vh;">
           <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-primary border-opacity-30">
             <span class="badge bg-primary text-white">L</span>
-            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Licensing</h4>
+            <h4 class="h6 fw-bold text-dark mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Licensing
+            </h4>
           </div>
           <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueLicensing"
             style="max-height: 35vh;">
@@ -175,11 +185,11 @@
         </div>
 
         <!-- Registration & Misc Column -->
-        <div class="col-12 col-md border-end border-secondary border-opacity-20 d-flex flex-column"
-          style="min-height: 35vh;">
+        <div class="col-12 col-md border-end border-light-subtle d-flex flex-column" style="min-height: 35vh;">
           <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-success border-opacity-30">
             <span class="badge bg-success text-white">R / M</span>
-            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Registration & Misc.</h4>
+            <h4 class="h6 fw-bold text-dark mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Registration
+              & Misc.</h4>
           </div>
           <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueRegistration"
             style="max-height: 35vh;">
@@ -188,10 +198,10 @@
         </div>
 
         <!-- LETAS Column -->
-        <div class="col-12 col-md border-end border-secondary border-opacity-20 d-flex flex-column" style="min-height: 35vh;">
+        <div class="col-12 col-md border-end border-light-subtle d-flex flex-column" style="min-height: 35vh;">
           <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-warning border-opacity-30">
             <span class="badge bg-warning text-dark">S / Q</span>
-            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">LETAS</h4>
+            <h4 class="h6 fw-bold text-dark mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">LETAS</h4>
           </div>
           <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueLETAS"
             style="max-height: 35vh;">
@@ -199,11 +209,12 @@
           </div>
         </div>
 
-        <!-- Licensing Cashier (Window 3) Column -->
-        <div class="col-12 col-md border-end border-secondary border-opacity-20 d-flex flex-column" style="min-height: 35vh;">
+        <!-- License Cashier (Window 3) Column -->
+        <div class="col-12 col-md border-end border-light-subtle d-flex flex-column" style="min-height: 35vh;">
           <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-info border-opacity-40">
             <span class="badge bg-info text-dark">W3</span>
-            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Licensing Cashier</h4>
+            <h4 class="h6 fw-bold text-dark mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">License
+              Cashier</h4>
           </div>
           <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueCashier3"
             style="max-height: 35vh;">
@@ -215,7 +226,8 @@
         <div class="col-12 col-md d-flex flex-column" style="min-height: 35vh;">
           <div class="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom border-danger border-opacity-40">
             <span class="badge bg-danger text-white">W8</span>
-            <h4 class="h6 fw-bold text-white mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Main Cashier</h4>
+            <h4 class="h6 fw-bold text-dark mb-0 text-uppercase tracking-wider" style="font-size: 0.8rem;">Main Cashier
+            </h4>
           </div>
           <div class="list-group list-group-flush overflow-y-auto flex-grow-1" id="queueCashier8"
             style="max-height: 35vh;">
@@ -240,13 +252,24 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Audio Unlock
+    // Audio Unlock / Toggle
     let audioEnabled = false;
-    document.getElementById('audioBanner').addEventListener('click', function () {
-      audioEnabled = true;
-      this.style.transform = 'translateY(-100%)';
-      setTimeout(() => this.style.display = 'none', 300);
-      playChimeSynth();
+    const audioBtn = document.getElementById('audioToggleBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    const audioText = document.getElementById('audioText');
+
+    audioBtn.addEventListener('click', function () {
+      audioEnabled = !audioEnabled;
+      if (audioEnabled) {
+        audioBtn.className = 'btn btn-outline-light btn-sm fw-semibold px-3 py-1.5 rounded-pill d-flex align-items-center gap-2 opacity-90';
+        audioIcon.className = 'bi bi-volume-up-fill fs-6 text-warning';
+        audioText.textContent = 'Audio Enabled';
+        playChimeSynth();
+      } else {
+        audioBtn.className = 'btn btn-warning btn-sm fw-bold px-3 py-1.5 rounded-pill shadow-sm d-flex align-items-center gap-2';
+        audioIcon.className = 'bi bi-volume-mute-fill fs-6';
+        audioText.textContent = 'Enable Audio';
+      }
     });
 
     // Sound Synth
@@ -282,23 +305,99 @@
       }
     }
 
-    // TTS
+    // TTS Voice Selection & Announcement
+    function getBestVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return null;
+
+      // 1. Natural / Neural / Premium English voices
+      const naturalVoice = voices.find(v => v.lang.startsWith('en') && (
+        v.name.includes('Natural') || 
+        v.name.includes('Google') || 
+        v.name.includes('Online') || 
+        v.name.includes('Neural') ||
+        v.name.includes('Premium') ||
+        v.name.includes('Aria') ||
+        v.name.includes('Guy') ||
+        v.name.includes('Jenny')
+      ));
+      if (naturalVoice) return naturalVoice;
+
+      // 2. Clear female English voices
+      const femaleVoice = voices.find(v => v.lang.startsWith('en') && (
+        v.name.includes('Zira') || 
+        v.name.includes('Samantha') || 
+        v.name.includes('Karen') || 
+        v.name.includes('Hazel')
+      ));
+      if (femaleVoice) return femaleVoice;
+
+      // 3. Any English voice
+      const englishVoice = voices.find(v => v.lang.startsWith('en'));
+      if (englishVoice) return englishVoice;
+
+      return voices[0];
+    }
+
+    function populateVoiceList() {
+      const voiceSelect = document.getElementById('voiceSelect');
+      if (!voiceSelect) return;
+
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return;
+
+      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+      if (!englishVoices.length) return;
+
+      voiceSelect.innerHTML = '';
+      const best = getBestVoice();
+
+      englishVoices.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.name;
+        option.textContent = voice.name.replace('Microsoft ', '').replace('Desktop', '').trim();
+        if (best && voice.name === best.name) {
+          option.selected = true;
+        }
+        voiceSelect.appendChild(option);
+      });
+
+      voiceSelect.classList.remove('d-none');
+    }
+
+    if (typeof speechSynthesis !== 'undefined') {
+      speechSynthesis.onvoiceschanged = populateVoiceList;
+      populateVoiceList();
+    }
+
     function announceTicket(ticketNumber, counterNumber) {
       if (!audioEnabled) return;
       setTimeout(() => {
-        const letter = ticketNumber.charAt(0);
-        const number = ticketNumber.substring(2);
-        const speechText = `Now serving Ticket: ${letter}, ${number}, at Window: ${counterNumber}.`;
+        let speechText = '';
+        if (ticketNumber.includes('-')) {
+          const parts = ticketNumber.split('-');
+          const prefix = parts[0].split('').join(' ');
+          const num = parts[1];
+          speechText = `Now serving Ticket ${prefix}, ${num}, at Window ${counterNumber}.`;
+        } else {
+          speechText = `Now serving Ticket ${ticketNumber}, at Window ${counterNumber}.`;
+        }
 
         const utterance = new SpeechSynthesisUtterance(speechText);
-        utterance.rate = 0.95;
+        utterance.rate = 0.9;
         utterance.pitch = 1.0;
 
+        const voiceSelect = document.getElementById('voiceSelect');
         const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(voice => voice.lang.includes('en-US') || voice.lang.includes('en-GB'));
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
+
+        if (voiceSelect && voiceSelect.value) {
+          const selectedVoice = voices.find(v => v.name === voiceSelect.value);
+          if (selectedVoice) utterance.voice = selectedVoice;
+        } else {
+          const bestVoice = getBestVoice();
+          if (bestVoice) utterance.voice = bestVoice;
         }
+
         window.speechSynthesis.speak(utterance);
       }, 950);
     }
@@ -341,9 +440,9 @@
         return subQueue.map(ticket => {
           const label = ticket.concern || ticket.service_type;
           return `
-            <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-1 py-2.5 text-white" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;">
-              <h4 class="mb-0 fw-bold fs-5">${ticket.ticket_number}</h4>
-              <span class="fs-6 text-white-50 text-end" style="max-width: 55%; word-break: break-word;">${label}</span>
+            <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-1 py-2.5 text-dark" style="border-bottom: 1px solid #e2e8f0 !important;">
+              <h4 class="mb-0 fw-bold fs-5 text-dark">${ticket.ticket_number}</h4>
+              <span class="fs-6 text-secondary text-end" style="max-width: 55%; word-break: break-word;">${label}</span>
             </div>
           `;
         }).join('');
