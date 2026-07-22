@@ -3,12 +3,12 @@
     LAND TRANSPORTATION
           OFFICE
 
-Queue No: DLS-101
+Queue No: MV-102
 
-Service: Licensing
-Concern: Other Transaction<br>(Duplicate, Conversion of Foreign, Revision of Record)
+Service: Registration
+Concern: Query
 
-Time: 12:00:08 AM
+Time: 1:20:58 AM
 
 Please wait until your
 number is called.
